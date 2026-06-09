@@ -1,1 +1,41 @@
 @import "tailwindcss";
+
+@theme {
+  --color-fruits: #f97316;
+  --color-vegetables: #22c55e;
+  --color-grains: #eab308;
+  --color-protein: #ef4444;
+  --color-dairy: #3b82f6;
+  --color-others: #a855f7;
+
+  --color-loved: #22c55e;
+  --color-neutral: #94a3b8;
+  --color-allergic: #ef4444;
+  --color-not-tried: #e2e8f0;
+}
+
+@layer base {
+  body {
+    font-family: 'Nunito', system-ui, sans-serif;
+    background-color: #f8fafc;
+    margin: 0;
+  }
+}
+
+@keyframes slide-up {
+  from { transform: translateY(100%); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.25s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+/* Hide scrollbar utility */
+.scrollbar-hide {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
