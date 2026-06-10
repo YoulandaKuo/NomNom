@@ -27,16 +27,13 @@
 @layer base {
   body {
     font-family: 'Nunito', system-ui, sans-serif;
-    background-color: #ece8e1;
+    background-color: #fff6ee;
     margin: 0;
-    overflow: hidden;
-    height: 100dvh;
   }
   #root {
-    height: 100dvh;
+    min-height: 100dvh;
     display: flex;
-    align-items: center;
-    justify-content: center;
+    flex-direction: column;
   }
 }
 

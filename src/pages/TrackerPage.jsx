@@ -6,49 +6,11 @@ import HomeScreen from './HomeScreen'
 import CategoryScreen from './CategoryScreen'
 import FoodModal from '../components/tracker/FoodModal'
 
-// Phone frame dimensions
-const DEV_W = 374
-const DEV_H = 792
-
-function PhoneStage({ children }) {
-  const [scale, setScale] = useState(1)
-
-  useEffect(() => {
-    const fit = () => {
-      const m = 24
-      const s = Math.min(1, (window.innerWidth - m) / DEV_W, (window.innerHeight - m) / DEV_H)
-      setScale(s)
-    }
-    fit()
-    window.addEventListener('resize', fit)
-    return () => window.removeEventListener('resize', fit)
-  }, [])
-
-  return (
-    <div style={{ width: DEV_W * scale, height: DEV_H * scale }}>
-      <div style={{
-        width: DEV_W, height: DEV_H,
-        transform: `scale(${scale})`, transformOrigin: 'top left',
-        borderRadius: 46, background: '#1c140d', padding: 7,
-        boxShadow: '0 30px 70px rgba(60,40,20,0.32), 0 6px 18px rgba(60,40,20,0.2)',
-      }}>
-        <div style={{
-          width: '100%', height: '100%', borderRadius: 39,
-          overflow: 'hidden', position: 'relative', background: '#fff6ee',
-          display: 'flex', flexDirection: 'column',
-        }}>
-          {children}
-        </div>
-      </div>
-    </div>
-  )
-}
-
 export default function TrackerPage() {
   const { state } = useApp()
   const { fetchFoods } = useFoods()
   const { fetchLogs } = useLogs()
-  const [screen, setScreen] = useState('home')      // 'home' | 'category'
+  const [screen, setScreen] = useState('home')
   const [activeCategory, setActiveCategory] = useState('all')
 
   useEffect(() => {
@@ -63,17 +25,13 @@ export default function TrackerPage() {
     setScreen('category')
   }
 
-  function goHome() {
-    setScreen('home')
-  }
-
   return (
-    <PhoneStage>
+    <div style={{ width: '100%', minHeight: '100dvh', background: '#fff6ee', display: 'flex', flexDirection: 'column', position: 'relative' }}>
       {screen === 'home'
         ? <HomeScreen onOpenCategory={openCategory} />
-        : <CategoryScreen category={activeCategory} onBack={goHome} />
+        : <CategoryScreen category={activeCategory} onBack={() => setScreen('home')} />
       }
       <FoodModal />
-    </PhoneStage>
+    </div>
   )
 }

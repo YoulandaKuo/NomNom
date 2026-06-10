@@ -13,32 +13,6 @@ function BackIcon() {
   )
 }
 
-function StatusBar({ color }) {
-  return (
-    <div style={{
-      height: 32, flexShrink: 0, display: 'flex', alignItems: 'center',
-      justifyContent: 'space-between', padding: '0 22px 0 24px',
-      background: color, color: '#fff',
-      fontFamily: '"Nunito", sans-serif', fontWeight: 800, fontSize: 14, letterSpacing: 0.2,
-    }}>
-      <span style={{ fontVariantNumeric: 'tabular-nums' }}>9:41</span>
-      <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-        <svg width="17" height="11" viewBox="0 0 17 11" fill="#fff">
-          <rect x="0" y="7" width="3" height="4" rx="1"/>
-          <rect x="4.5" y="5" width="3" height="6" rx="1"/>
-          <rect x="9" y="2.5" width="3" height="8.5" rx="1"/>
-          <rect x="13.5" y="0" width="3" height="11" rx="1"/>
-        </svg>
-        <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
-          <rect x="0.5" y="0.5" width="18" height="10" rx="2.5" stroke="#fff" opacity="0.7"/>
-          <rect x="2" y="2" width="13" height="7" rx="1.2" fill="#fff"/>
-          <rect x="20" y="3.5" width="1.5" height="4" rx="0.75" fill="#fff" opacity="0.7"/>
-        </svg>
-      </span>
-    </div>
-  )
-}
-
 export default function CategoryScreen({ category, onBack }) {
   const { state, dispatch } = useApp()
   const isAll = category === 'all'
@@ -65,39 +39,36 @@ export default function CategoryScreen({ category, onBack }) {
   }, [isAll, allFoods, state.foods])
 
   return (
-    <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', background: '#fff6ee' }}>
-      <StatusBar color={m.color} />
-
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
       {/* Colour-block header */}
-      <div style={{ background: m.color, padding: '4px 18px 18px', color: '#fff', borderRadius: '0 0 26px 26px', flexShrink: 0 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <button onClick={onBack} aria-label="Back"
-            style={{
-              width: 38, height: 38, borderRadius: 13, background: 'rgba(255,255,255,0.22)',
-              display: 'grid', placeItems: 'center', color: '#fff', border: 'none', cursor: 'pointer', flexShrink: 0,
-            }}>
-            <BackIcon />
-          </button>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontFamily: '"Baloo 2", sans-serif', fontSize: 26, fontWeight: 800, lineHeight: 1 }}>
-              {m.label} {m.emoji}
-            </div>
-            <div style={{ fontFamily: '"Nunito", sans-serif', fontWeight: 800, fontSize: 13, opacity: 0.9 }}>
-              {tried} of {total} tried · {toGo} to go
+      <div style={{ background: m.color, padding: '16px 18px 18px', color: '#fff', borderRadius: '0 0 26px 26px', flexShrink: 0 }}>
+        <div style={{ maxWidth: 600, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <button onClick={onBack} aria-label="Back"
+              style={{ width: 38, height: 38, borderRadius: 13, background: 'rgba(255,255,255,0.22)', display: 'grid', placeItems: 'center', color: '#fff', border: 'none', cursor: 'pointer', flexShrink: 0 }}>
+              <BackIcon />
+            </button>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontFamily: '"Baloo 2", sans-serif', fontSize: 26, fontWeight: 800, lineHeight: 1 }}>
+                {m.label} {m.emoji}
+              </div>
+              <div style={{ fontFamily: '"Nunito", sans-serif', fontWeight: 800, fontSize: 13, opacity: 0.9 }}>
+                {tried} of {total} tried · {toGo} to go
+              </div>
             </div>
           </div>
+          {!isAll && (
+            <div style={{ display: 'flex', height: 8, borderRadius: 4, marginTop: 13, overflow: 'hidden', background: 'rgba(255,255,255,0.3)' }}>
+              {tried > 0 && (
+                <div style={{ flex: `0 0 ${tried / total * 100}%`, height: '100%', background: '#fff', transition: 'flex-basis .35s ease' }} />
+              )}
+            </div>
+          )}
         </div>
-        {!isAll && (
-          <div style={{ display: 'flex', height: 8, borderRadius: 4, marginTop: 13, overflow: 'hidden', background: 'rgba(255,255,255,0.3)' }}>
-            {tried > 0 && (
-              <div style={{ flex: `0 0 ${tried / total * 100}%`, height: '100%', background: '#fff', transition: 'flex-basis .35s ease' }} />
-            )}
-          </div>
-        )}
       </div>
 
       {/* Food grid */}
-      <div style={{ flex: 1, minHeight: 0, padding: '14px 16px 26px', overflowY: 'auto' }} className="scrollbar-hide">
+      <div style={{ flex: 1, padding: '14px 16px 32px', overflowY: 'auto', maxWidth: 600, width: '100%', margin: '0 auto', boxSizing: 'border-box' }} className="scrollbar-hide">
         {isAll ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             {sections.map(({ cat, foods }) => {
@@ -112,7 +83,7 @@ export default function CategoryScreen({ category, onBack }) {
                     <span style={{ fontFamily: '"Baloo 2", sans-serif', fontWeight: 800, fontSize: 16, color: '#241a12' }}>{cat.label}</span>
                     <span style={{ fontFamily: '"Nunito", sans-serif', fontWeight: 800, fontSize: 12, color: '#8a7d70' }}>{catTried}/{foods.length}</span>
                   </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 11 }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 11 }}>
                     {foods.map(food => (
                       <FoodCard key={food.id} food={food} onOpen={() => dispatch({ type: 'OPEN_MODAL', foodId: food.id })} />
                     ))}
@@ -122,11 +93,10 @@ export default function CategoryScreen({ category, onBack }) {
             })}
           </div>
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 11 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 11 }}>
             {allFoods.map(food => (
               <FoodCard key={food.id} food={food} onOpen={() => dispatch({ type: 'OPEN_MODAL', foodId: food.id })} />
             ))}
-            {/* Add food tile */}
             <button
               onClick={() => dispatch({ type: 'OPEN_ADD_FOOD' })}
               style={{
