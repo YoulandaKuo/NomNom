@@ -32,18 +32,18 @@ export default function HomeScreen({ onOpenCategory }) {
 
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: 8 }}>
-        <div style={{ fontFamily: '"Baloo 2", sans-serif', fontSize: 28, fontWeight: 800, lineHeight: 1, color: '#241a12' }}>
-          Nom Nom
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <img src="/hedgehog.png" alt="Nibble the hedgehog"
-            style={{ width: 75, height: 56, objectFit: 'contain', display: 'block' }} />
-          <button onClick={signOut}
-            style={{ width: 34, height: 34, borderRadius: '50%', background: 'rgba(36,26,18,0.08)', border: 'none', cursor: 'pointer', display: 'grid', placeItems: 'center', color: '#8a7d70' }}
-            aria-label="Sign out">
-            <LogOut size={16} />
-          </button>
+            style={{ width: 60, height: 45, objectFit: 'contain', display: 'block' }} />
+          <div style={{ fontFamily: '"Baloo 2", sans-serif', fontSize: 28, fontWeight: 800, lineHeight: 1, color: '#241a12' }}>
+            Nom Nom
+          </div>
         </div>
+        <button onClick={signOut}
+          style={{ width: 34, height: 34, borderRadius: '50%', background: 'rgba(36,26,18,0.08)', border: 'none', cursor: 'pointer', display: 'grid', placeItems: 'center', color: '#8a7d70' }}
+          aria-label="Sign out">
+          <LogOut size={16} />
+        </button>
       </div>
 
       {/* Variety hero — tap to browse all */}
