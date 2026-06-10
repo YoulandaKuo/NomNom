@@ -34,8 +34,8 @@ export default function HomeScreen({ onOpenCategory }) {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: 8 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <img src="/hedgehog.png" alt="Nibble the hedgehog"
-            style={{ width: 60, height: 45, objectFit: 'contain', display: 'block' }} />
-          <div style={{ fontFamily: '"Baloo 2", sans-serif', fontSize: 28, fontWeight: 800, lineHeight: 1, color: '#241a12' }}>
+            style={{ width: 60, height: 45, objectFit: 'contain', display: 'block', flexShrink: 0 }} />
+          <div style={{ fontFamily: '"Baloo 2", sans-serif', fontSize: 28, fontWeight: 800, lineHeight: 1, color: '#241a12', transform: 'translateY(4px)' }}>
             Nom Nom
           </div>
         </div>
