@@ -1,10 +1,10 @@
 export const CATEGORIES = [
-  { id: 'Fruits',     label: 'Fruits',     emoji: '🍎', color: '#f97316' },
-  { id: 'Vegetables', label: 'Vegetables', emoji: '🥦', color: '#22c55e' },
-  { id: 'Grains',     label: 'Grains',     emoji: '🌾', color: '#eab308' },
-  { id: 'Protein',    label: 'Protein',    emoji: '🍗', color: '#ef4444' },
-  { id: 'Dairy',      label: 'Dairy',      emoji: '🥛', color: '#3b82f6' },
-  { id: 'Others',     label: 'Others',     emoji: '✨', color: '#a855f7' },
+  { id: 'Fruits',     label: 'Fruits',     emoji: '🍓', color: '#ff7d24', dk: '#e8650f', tint: '#fff1e3' },
+  { id: 'Vegetables', label: 'Vegetables', emoji: '🥦', color: '#16a34a', dk: '#0f8040', tint: '#e8f7ee' },
+  { id: 'Grains',     label: 'Grains',     emoji: '🌾', color: '#f5a300', dk: '#d98c00', tint: '#fff4d9' },
+  { id: 'Protein',    label: 'Protein',    emoji: '🍗', color: '#ec4d3f', dk: '#cf372b', tint: '#fdeae8' },
+  { id: 'Dairy',      label: 'Dairy',      emoji: '🧀', color: '#3b82f6', dk: '#2667c4', tint: '#e9f0ff' },
+  { id: 'Others',     label: 'Others',     emoji: '🥣', color: '#7c3aed', dk: '#5b21b6', tint: '#efe9fd' },
 ]
 
 export const CATEGORY_MAP = Object.fromEntries(CATEGORIES.map(c => [c.id, c]))

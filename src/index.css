@@ -1,37 +1,54 @@
 @import "tailwindcss";
 
 @theme {
-  --color-fruits: #f97316;
-  --color-vegetables: #22c55e;
-  --color-grains: #eab308;
-  --color-protein: #ef4444;
-  --color-dairy: #3b82f6;
-  --color-others: #a855f7;
+  --font-display: 'Baloo 2', system-ui, sans-serif;
+  --font-body: 'Nunito', system-ui, sans-serif;
 
-  --color-loved: #22c55e;
-  --color-neutral: #94a3b8;
-  --color-allergic: #ef4444;
+  /* Fruit Stand palette */
+  --color-fs-bg: #fff6ee;
+  --color-fs-ink: #241a12;
+  --color-fs-sub: #8a7d70;
+  --color-fs-paper: #ffffff;
+
+  /* Category colors */
+  --color-fruits: #ff7d24;
+  --color-vegetables: #16a34a;
+  --color-grains: #f5a300;
+  --color-protein: #ec4d3f;
+  --color-dairy: #3b82f6;
+  --color-others: #7c3aed;
+
+  --color-loved: #16a34a;
+  --color-neutral: #f5a300;
+  --color-allergic: #ec4d3f;
   --color-not-tried: #e2e8f0;
 }
 
 @layer base {
   body {
     font-family: 'Nunito', system-ui, sans-serif;
-    background-color: #f8fafc;
+    background-color: #ece8e1;
     margin: 0;
+    overflow: hidden;
+    height: 100dvh;
+  }
+  #root {
+    height: 100dvh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 }
 
 @keyframes slide-up {
-  from { transform: translateY(100%); opacity: 0; }
-  to   { transform: translateY(0);    opacity: 1; }
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
 }
 
 .animate-slide-up {
-  animation: slide-up 0.25s cubic-bezier(0.32, 0.72, 0, 1);
+  animation: slide-up 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-/* Hide scrollbar utility */
 .scrollbar-hide {
   scrollbar-width: none;
   -ms-overflow-style: none;

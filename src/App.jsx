@@ -7,10 +7,10 @@ export default function App() {
 
   if (state.loading.auth) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-orange-50">
-        <div className="text-center">
-          <div className="text-5xl mb-3 animate-bounce">🦔</div>
-          <p className="font-bold text-slate-500">Loading…</p>
+      <div style={{ minHeight: '100dvh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#ece8e1' }}>
+        <div style={{ textAlign: 'center' }}>
+          <img src="/hedgehog.png" alt="" style={{ width: 75, height: 56, objectFit: 'contain' }} />
+          <p style={{ fontFamily: '"Baloo 2", sans-serif', fontWeight: 800, fontSize: 15, color: '#8a7d70', marginTop: 8 }}>Loading…</p>
         </div>
       </div>
     )
