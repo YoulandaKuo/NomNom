@@ -373,9 +373,10 @@ export default function FoodModal() {
           opacity: shown ? 1 : 0,
           transition: 'opacity .2s ease',
         }} />
-      {/* Sheet */}
+      {/* Sheet — full-width on mobile, centered 600px column on larger screens */}
       <div style={{
         position: 'absolute', left: 0, right: 0, bottom: 0,
+        maxWidth: 600, margin: '0 auto',
         background: '#fff', borderRadius: '28px 28px 0 0',
         boxShadow: '0 -10px 40px rgba(0,0,0,0.25)',
         maxHeight: '88%', display: 'flex', flexDirection: 'column',
