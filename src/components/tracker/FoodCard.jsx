@@ -3,6 +3,7 @@ import { CATEGORY_MAP, REACTION_MAP } from '../../lib/preloadedFoods'
 
 const REACTION_FACE = {
   loved:     { mood: 'love',  mouth: 'M6 13 q6 7 12 0' },
+  meh:       { mood: 'meh',   mouth: 'M7 14.5 q2.5 -2.5 5 0 q2.5 2.5 5 0' },
   neutral:   { mood: 'meh',   mouth: 'M7.5 14 h9' },
   allergic:  { mood: 'no',    mouth: 'M7 15 q5 -4 10 0' },
   not_tried: { mood: 'meh',   mouth: 'M7.5 14 h9' },
@@ -18,17 +19,22 @@ function ReactionFace({ reaction, size = 18 }) {
   return (
     <svg viewBox="0 0 24 24" width={size} height={size} style={{ display: 'block' }}>
       <circle cx="12" cy="12" r="12" fill={bg} />
-      {reaction === 'loved'
-        ? <>
-            <path d="M8 8.5 q2 -2 3 0" fill="none" stroke={ink} strokeWidth="1.6" strokeLinecap="round"/>
-            <path d="M13 8.5 q2 -2 3 0" fill="none" stroke={ink} strokeWidth="1.6" strokeLinecap="round"/>
-          </>
+      {reaction === 'tried'
+        ? <path d="M7.5 12.5 l3 3 l6 -6.5" fill="none" stroke={ink} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
         : <>
-            <circle cx="9" cy={eyeY} r="1.4" fill={ink}/>
-            <circle cx="15" cy={eyeY} r="1.4" fill={ink}/>
+            {reaction === 'loved'
+              ? <>
+                  <path d="M8 8.5 q2 -2 3 0" fill="none" stroke={ink} strokeWidth="1.6" strokeLinecap="round"/>
+                  <path d="M13 8.5 q2 -2 3 0" fill="none" stroke={ink} strokeWidth="1.6" strokeLinecap="round"/>
+                </>
+              : <>
+                  <circle cx="9" cy={eyeY} r="1.4" fill={ink}/>
+                  <circle cx="15" cy={eyeY} r="1.4" fill={ink}/>
+                </>
+            }
+            <path d={face.mouth} fill="none" stroke={ink} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
           </>
       }
-      <path d={face.mouth} fill="none" stroke={ink} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
     </svg>
   )
 }

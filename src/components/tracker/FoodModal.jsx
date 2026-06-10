@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react'
-import { format } from 'date-fns'
+import { format, parseISO } from 'date-fns'
 import { useApp } from '../../context/AppContext'
 import { useFoods } from '../../hooks/useFoods'
 import { useLogs } from '../../hooks/useLogs'
-import { REACTIONS, REACTION_MAP, CATEGORIES, CATEGORY_MAP } from '../../lib/preloadedFoods'
+import { REACTION_MAP, CATEGORIES, CATEGORY_MAP, MOODS, BABY_NAME } from '../../lib/preloadedFoods'
 
 const REACTION_FACE = {
   loved:     { mouth: 'M6 13 q6 7 12 0', eyeY: 9.5, hearts: true },
+  meh:       { mouth: 'M7 14.5 q2.5 -2.5 5 0 q2.5 2.5 5 0', eyeY: 10 },
   neutral:   { mouth: 'M7.5 14 h9',      eyeY: 10 },
   allergic:  { mouth: 'M7 15 q5 -4 10 0', eyeY: 10 },
   not_tried: { mouth: 'M7.5 14 h9',      eyeY: 10 },
@@ -45,50 +46,65 @@ function LogForm({ food, onClose }) {
   const { upsertLog } = useLogs()
   const existing = state.logs[food.id]
   const cat = CATEGORY_MAP[food.category] ?? CATEGORIES[0]
+  const today = format(new Date(), 'yyyy-MM-dd')
 
-  const [reaction, setReaction] = useState(existing?.reaction ?? 'not_tried')
-  const [dateTried, setDateTried] = useState(existing?.date_tried ?? format(new Date(), 'yyyy-MM-dd'))
-  const [notes, setNotes] = useState(existing?.notes ?? '')
-  const [saving, setSaving] = useState(false)
+  const stored = existing?.reaction ?? 'not_tried'
+  const [tried, setTried] = useState(stored !== 'not_tried')
+  const [mood, setMood] = useState(MOODS.includes(stored) ? stored : null)
+  const [dateTried, setDateTried] = useState(existing?.date_tried ?? null)
+  const [editingDate, setEditingDate] = useState(false)
   const [error, setError] = useState('')
 
-  async function handleReact(r) {
-    setReaction(r)
-  }
-
-  async function handleSave(e) {
-    e.preventDefault()
-    setSaving(true)
+  // Every interaction saves immediately — there is no Save button in this sheet
+  async function save({ reaction, date_tried }) {
     setError('')
     try {
       await upsertLog({
         food_id: food.id,
-        date_tried: reaction !== 'not_tried' ? dateTried : null,
-        reaction,
-        notes: notes.trim() || null,
         userId: state.user.id,
+        reaction,
+        date_tried,
+        notes: existing?.notes ?? null,
       })
-      onClose()
     } catch (err) {
       setError(err.message)
-      setSaving(false)
     }
   }
 
-  const isNew = !existing || existing.reaction === 'not_tried'
-  const statBlocks = [
-    { label: 'Category', value: `${cat.emoji} ${cat.label}`, bg: cat.tint, color: cat.dk },
-    { label: 'Date', value: existing?.date_tried ?? '—', bg: '#eef4ff', color: '#3b82f6' },
-    { label: 'Mood', value: existing ? (REACTION_MAP[existing.reaction]?.label ?? existing.reaction) : 'New', bg: '#fff6e0', color: existing ? (REACTION_MAP[existing.reaction]?.color ?? '#c4b4a3') : '#c4b4a3' },
-  ]
+  function markTried() {
+    if (tried) return
+    const date = dateTried ?? today
+    setTried(true)
+    setDateTried(date)
+    save({ reaction: mood ?? 'tried', date_tried: date })
+  }
+
+  function markNotYet() {
+    if (!tried) return
+    setTried(false)
+    setEditingDate(false)
+    save({ reaction: 'not_tried', date_tried: null })
+  }
+
+  function pickMood(m) {
+    const next = mood === m ? null : m
+    setMood(next)
+    save({ reaction: next ?? 'tried', date_tried: dateTried })
+  }
+
+  function changeDate(value) {
+    if (!value) return
+    setDateTried(value)
+    save({ reaction: mood ?? 'tried', date_tried: value })
+  }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', maxHeight: '100%' }}>
       {/* Handle bar */}
-      <div style={{ width: 44, height: 5, borderRadius: 3, background: '#e3d7c8', margin: '10px auto 12px', flexShrink: 0 }} />
+      <div style={{ width: 44, height: 5, borderRadius: 3, background: '#e3d7c8', margin: '10px auto 14px', flexShrink: 0 }} />
 
       {/* Title row */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 13, marginBottom: 13, padding: '0 18px', flexShrink: 0 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 13, marginBottom: 18, padding: '0 18px', flexShrink: 0 }}>
         <div style={{
           width: 62, height: 62, flexShrink: 0, borderRadius: 20,
           background: cat.tint, display: 'grid', placeItems: 'center', fontSize: 36,
@@ -114,89 +130,113 @@ function LogForm({ food, onClose }) {
         </button>
       </div>
 
-      {/* Stat blocks */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 9, marginBottom: 15, padding: '0 18px', flexShrink: 0 }}>
-        {statBlocks.map(({ label, value, bg, color }) => (
-          <div key={label} style={{ background: bg, borderRadius: 16, padding: '10px 8px', textAlign: 'center' }}>
-            <div style={{ fontFamily: '"Nunito", sans-serif', fontWeight: 800, fontSize: 10, color: '#8a7d70', letterSpacing: 0.3 }}>
-              {label.toUpperCase()}
-            </div>
-            <div style={{ fontFamily: '"Baloo 2", sans-serif', fontWeight: 800, fontSize: 14, color, lineHeight: 1.2, marginTop: 2 }}>
-              {value}
-            </div>
-          </div>
-        ))}
-      </div>
-
       {/* Scrollable body */}
-      <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '0 18px 20px' }} className="scrollbar-hide">
-        {/* Reaction picker */}
-        <div style={{ fontFamily: '"Baloo 2", sans-serif', fontWeight: 800, fontSize: 16, marginBottom: 9, color: '#241a12' }}>
-          {isNew ? 'Log the first taste' : 'How did it go this time?'}
-        </div>
-        <div style={{ display: 'flex', gap: 8, marginBottom: 17 }}>
-          {REACTIONS.filter(r => r.value !== 'not_tried').map(r => {
-            const on = r.value === reaction
-            return (
-              <button key={r.value} type="button" onClick={() => handleReact(r.value)}
-                style={{
-                  flex: 1, textAlign: 'center', borderRadius: 16, padding: '9px 2px 7px',
-                  border: 'none', cursor: 'pointer',
-                  background: on ? r.color : '#f6efe6',
-                  boxShadow: on ? `0 5px 14px ${r.color}55` : 'none',
-                  transition: 'transform .1s ease, background .15s ease',
-                }}
-                onPointerDown={e => e.currentTarget.style.transform = 'scale(0.93)'}
-                onPointerUp={e => e.currentTarget.style.transform = 'scale(1)'}
-                onPointerLeave={e => e.currentTarget.style.transform = 'scale(1)'}>
-                <Face reaction={r.value} size={28} ink={on ? '#fff' : '#8a7d70'} />
-                <div style={{ fontFamily: '"Nunito", sans-serif', fontWeight: 800, fontSize: 10.5, marginTop: 3, color: on ? '#fff' : '#8a7d70' }}>
-                  {r.label}
-                </div>
-              </button>
-            )
-          })}
+      <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '0 18px 22px' }} className="scrollbar-hide">
+        {/* Not yet / Tried it toggle */}
+        <div style={{ display: 'flex', background: '#f3ece2', borderRadius: 26, padding: 5, marginBottom: 18 }}>
+          <button type="button" onClick={markNotYet}
+            style={{
+              flex: 1, padding: '13px 8px', borderRadius: 21, border: 'none', cursor: 'pointer',
+              background: !tried ? '#fff' : 'transparent',
+              boxShadow: !tried ? '0 4px 12px rgba(36,26,18,0.14)' : 'none',
+              color: !tried ? '#241a12' : '#8a7d70',
+              fontFamily: '"Baloo 2", sans-serif', fontWeight: 800, fontSize: 16,
+              transition: 'all .15s ease',
+            }}>
+            Not yet
+          </button>
+          <button type="button" onClick={markTried}
+            style={{
+              flex: 1, padding: '13px 8px', borderRadius: 21, border: 'none', cursor: 'pointer',
+              background: tried ? '#f5862f' : 'transparent',
+              boxShadow: tried ? '0 5px 14px rgba(245,134,47,0.45)' : 'none',
+              color: tried ? '#fff' : '#8a7d70',
+              fontFamily: '"Baloo 2", sans-serif', fontWeight: 800, fontSize: 16,
+              transition: 'all .15s ease',
+            }}>
+            {tried ? '✓ Tried it' : 'Tried it'}
+          </button>
         </div>
 
-        {/* Date */}
-        {reaction !== 'not_tried' && (
-          <div style={{ marginBottom: 13 }}>
-            <div style={{ fontFamily: '"Nunito", sans-serif', fontWeight: 800, fontSize: 12, color: '#8a7d70', marginBottom: 6 }}>DATE TRIED</div>
-            <input type="date" value={dateTried} onChange={e => setDateTried(e.target.value)}
-              max={format(new Date(), 'yyyy-MM-dd')}
-              style={{
-                width: '100%', padding: '10px 14px', borderRadius: 14, border: '2px solid #e8ddd4',
-                fontFamily: '"Nunito", sans-serif', fontWeight: 700, fontSize: 14, color: '#241a12',
-                background: '#faf5ee', outline: 'none', boxSizing: 'border-box',
-              }} />
+        {tried ? (
+          <>
+            {/* Mood picker */}
+            <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 10 }}>
+              <div style={{ fontFamily: '"Baloo 2", sans-serif', fontWeight: 800, fontSize: 17, color: '#241a12' }}>
+                How did {BABY_NAME} like it?
+              </div>
+              <div style={{ fontFamily: '"Nunito", sans-serif', fontWeight: 700, fontSize: 13, color: '#8a7d70' }}>
+                optional
+              </div>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, marginBottom: 16 }}>
+              {MOODS.map(m => {
+                const r = REACTION_MAP[m]
+                const on = m === mood
+                return (
+                  <button key={m} type="button" onClick={() => pickMood(m)}
+                    style={{
+                      textAlign: 'center', borderRadius: 20, padding: '20px 4px 16px',
+                      border: 'none', cursor: 'pointer',
+                      background: on ? r.color : '#f3ece2',
+                      boxShadow: on ? `0 0 0 4px ${r.color}33, 0 6px 16px ${r.color}55` : 'none',
+                      display: 'grid', placeItems: 'center',
+                      transition: 'transform .1s ease, background .15s ease',
+                    }}
+                    onPointerDown={e => e.currentTarget.style.transform = 'scale(0.93)'}
+                    onPointerUp={e => e.currentTarget.style.transform = 'scale(1)'}
+                    onPointerLeave={e => e.currentTarget.style.transform = 'scale(1)'}>
+                    <Face reaction={m} size={30} ink={on ? '#fff' : '#8a7d70'} />
+                    <div style={{ fontFamily: '"Nunito", sans-serif', fontWeight: 800, fontSize: 12.5, marginTop: 6, color: on ? '#fff' : '#8a7d70' }}>
+                      {r.label}
+                    </div>
+                  </button>
+                )
+              })}
+            </div>
+
+            {/* First tried date */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: '#f6efe6', borderRadius: 20, padding: '14px 16px' }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontFamily: '"Nunito", sans-serif', fontWeight: 800, fontSize: 11, letterSpacing: 0.8, color: '#8a7d70' }}>
+                  FIRST TRIED
+                </div>
+                {editingDate ? (
+                  <input type="date" autoFocus value={dateTried ?? ''} max={today}
+                    onChange={e => changeDate(e.target.value)}
+                    style={{
+                      marginTop: 4, padding: '6px 10px', borderRadius: 12, border: '2px solid #e8ddd4',
+                      fontFamily: '"Nunito", sans-serif', fontWeight: 700, fontSize: 14, color: '#241a12',
+                      background: '#fff', outline: 'none', boxSizing: 'border-box', maxWidth: '100%',
+                    }} />
+                ) : (
+                  <div style={{ fontFamily: '"Baloo 2", sans-serif', fontWeight: 800, fontSize: 22, color: '#241a12', marginTop: 2, lineHeight: 1.1 }}>
+                    {dateTried ? format(parseISO(dateTried), 'MMM d') : '—'}
+                  </div>
+                )}
+              </div>
+              <button type="button" onClick={() => setEditingDate(v => !v)}
+                style={{
+                  flexShrink: 0, border: 'none', cursor: 'pointer',
+                  background: '#fdeedd', color: '#f5862f',
+                  fontFamily: '"Baloo 2", sans-serif', fontWeight: 800, fontSize: 15,
+                  padding: '10px 16px', borderRadius: 14,
+                }}>
+                {editingDate ? 'Done' : 'Change'}
+              </button>
+            </div>
+          </>
+        ) : (
+          /* Not-yet message */
+          <div style={{
+            background: '#f6efe6', borderRadius: 20, padding: '18px 20px', textAlign: 'center',
+            fontFamily: '"Nunito", sans-serif', fontWeight: 700, fontSize: 15, lineHeight: 1.5, color: '#8a7d70',
+          }}>
+            {food.name} is still on the list — mark it tried when {BABY_NAME} takes the first taste.
           </div>
         )}
 
-        {/* Notes */}
-        <div style={{ marginBottom: 17 }}>
-          <div style={{ fontFamily: '"Nunito", sans-serif', fontWeight: 800, fontSize: 12, color: '#8a7d70', marginBottom: 6 }}>NOTES (OPTIONAL)</div>
-          <textarea value={notes} onChange={e => setNotes(e.target.value)}
-            placeholder="Any observations, amounts, how it was prepared…"
-            rows={3}
-            style={{
-              width: '100%', padding: '10px 14px', borderRadius: 14, border: '2px solid #e8ddd4',
-              fontFamily: '"Nunito", sans-serif', fontWeight: 600, fontSize: 13, color: '#241a12',
-              background: '#faf5ee', outline: 'none', resize: 'none', boxSizing: 'border-box',
-            }} />
-        </div>
-
-        {error && <p style={{ color: '#ec4d3f', fontWeight: 700, fontSize: 13, marginBottom: 12 }}>{error}</p>}
-
-        <button onClick={handleSave} disabled={saving || reaction === 'not_tried'}
-          style={{
-            width: '100%', padding: '14px', borderRadius: 18, border: 'none', cursor: 'pointer',
-            background: reaction === 'not_tried' ? '#e8ddd4' : '#241a12',
-            color: reaction === 'not_tried' ? '#8a7d70' : '#fff',
-            fontFamily: '"Baloo 2", sans-serif', fontWeight: 800, fontSize: 17,
-            transition: 'background .15s ease',
-          }}>
-          {saving ? 'Saving…' : 'Save'}
-        </button>
+        {error && <p style={{ color: '#ec4d3f', fontWeight: 700, fontSize: 13, marginTop: 12, marginBottom: 0 }}>{error}</p>}
       </div>
     </div>
   )

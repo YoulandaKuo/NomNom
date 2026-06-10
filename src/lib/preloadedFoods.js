@@ -10,13 +10,21 @@ export const CATEGORIES = [
 export const CATEGORY_MAP = Object.fromEntries(CATEGORIES.map(c => [c.id, c]))
 
 export const REACTIONS = [
-  { value: 'loved',     label: 'Loved it',     emoji: '😍', color: '#22c55e' },
+  { value: 'loved',     label: 'Loved it',      emoji: '😍', color: '#22c55e' },
+  { value: 'meh',       label: 'Meh',           emoji: '😕', color: '#f5a300' },
   { value: 'neutral',   label: 'Neutral',       emoji: '😐', color: '#94a3b8' },
+  { value: 'tried',     label: 'Tried',         emoji: '✅', color: '#ff7d24' },
   { value: 'allergic',  label: 'Allergic',      emoji: '🚨', color: '#ef4444' },
   { value: 'not_tried', label: 'Not tried yet', emoji: '💤', color: '#e2e8f0' },
 ]
 
 export const REACTION_MAP = Object.fromEntries(REACTIONS.map(r => [r.value, r]))
+
+// Moods offered in the food detail sheet ('tried' = tried with no mood logged,
+// 'allergic' is kept above so legacy logs still render)
+export const MOODS = ['loved', 'meh', 'neutral']
+
+export const BABY_NAME = 'Remi'
 
 export const MILESTONES = [
   { count: 5,   message: "Hoji is paying attention! 👀" },
