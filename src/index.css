@@ -41,9 +41,30 @@
   from { transform: translateY(100%); }
   to   { transform: translateY(0); }
 }
+@keyframes slide-down {
+  from { transform: translateY(0); }
+  to   { transform: translateY(100%); }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes fade-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
 
-.animate-slide-up {
-  animation: slide-up 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+.modal-overlay-enter {
+  animation: fade-in 0.25s ease forwards;
+}
+.modal-overlay-exit {
+  animation: fade-out 0.22s ease forwards;
+}
+.modal-sheet-enter {
+  animation: slide-up 0.32s cubic-bezier(0.32, 0.72, 0, 1) forwards;
+}
+.modal-sheet-exit {
+  animation: slide-down 0.25s cubic-bezier(0.32, 0.72, 0, 1) forwards;
 }
 
 .scrollbar-hide {

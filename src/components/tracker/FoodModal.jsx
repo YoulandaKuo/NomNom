@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { format, parseISO } from 'date-fns'
 import { useApp } from '../../context/AppContext'
 import { useFoods } from '../../hooks/useFoods'
@@ -251,6 +251,14 @@ function AddFoodForm({ onClose, onAdded }) {
   const [category, setCategory] = useState(state.addFoodDefaultCategory ?? 'Fruits')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+  const nameRef = useRef(null)
+
+  // Focus the name field only after the sheet has slid into place, and without
+  // letting the browser scroll the page to chase the (initially off-screen) input.
+  useEffect(() => {
+    const t = setTimeout(() => nameRef.current?.focus({ preventScroll: true }), 320)
+    return () => clearTimeout(t)
+  }, [])
 
   async function handleSubmit(e) {
     e.preventDefault()
@@ -280,8 +288,8 @@ function AddFoodForm({ onClose, onAdded }) {
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <div>
             <div style={{ fontFamily: '"Nunito", sans-serif', fontWeight: 800, fontSize: 12, color: '#8a7d70', marginBottom: 6 }}>FOOD NAME</div>
-            <input value={name} onChange={e => setName(e.target.value)} placeholder="e.g. Dragon Fruit"
-              autoFocus required
+            <input ref={nameRef} value={name} onChange={e => setName(e.target.value)} placeholder="e.g. Dragon Fruit"
+              required
               style={{
                 width: '100%', padding: '12px 14px', borderRadius: 14, border: '2px solid #e8ddd4',
                 fontFamily: '"Nunito", sans-serif', fontWeight: 700, fontSize: 15, color: '#241a12',
@@ -328,10 +336,13 @@ function AddFoodForm({ onClose, onAdded }) {
 }
 
 // ── Bottom sheet wrapper ──────────────────────────────────────────────────────
+const ANIM_DURATION = 280
+
 export default function FoodModal() {
   const { state, dispatch } = useApp()
   const [addedFood, setAddedFood] = useState(null)
-  const [shown, setShown] = useState(false)
+  const [visible, setVisible] = useState(false)
+  const [exiting, setExiting] = useState(false)
 
   const isOpen = !!state.modalFoodId || state.isAddingFood
   const food = state.modalFoodId
@@ -339,16 +350,26 @@ export default function FoodModal() {
     : addedFood
 
   useEffect(() => {
-    if (isOpen) requestAnimationFrame(() => setShown(true))
-    else setShown(false)
+    if (isOpen) {
+      setExiting(false)
+      setVisible(true)
+    } else if (visible) {
+      setExiting(true)
+      const t = setTimeout(() => {
+        setVisible(false)
+        setExiting(false)
+        setAddedFood(null)
+      }, ANIM_DURATION)
+      return () => clearTimeout(t)
+    }
   }, [isOpen])
 
   function handleClose() {
-    setShown(false)
+    setExiting(true)
     setTimeout(() => {
       setAddedFood(null)
       dispatch({ type: 'CLOSE_MODAL' })
-    }, 220)
+    }, ANIM_DURATION)
   }
 
   function handleAdded(newFood) {
@@ -357,32 +378,26 @@ export default function FoodModal() {
     dispatch({ type: 'OPEN_MODAL', foodId: newFood.id })
   }
 
-  useEffect(() => {
-    if (!isOpen) setAddedFood(null)
-  }, [isOpen])
-
-  if (!isOpen && !shown) return null
+  if (!visible) return null
 
   return (
     <div style={{ position: 'absolute', inset: 0, zIndex: 6 }}>
-      {/* Backdrop */}
+      {/* Backdrop — fades in over the static page, sheet stays put underneath */}
       <div onClick={handleClose}
-        style={{
-          position: 'absolute', inset: 0,
-          background: 'rgba(36,26,18,0.5)',
-          opacity: shown ? 1 : 0,
-          transition: 'opacity .2s ease',
-        }} />
+        className={exiting ? 'modal-overlay-exit' : 'modal-overlay-enter'}
+        style={{ position: 'absolute', inset: 0, background: 'rgba(36,26,18,0.5)' }}
+      />
       {/* Sheet — full-width on mobile, centered 600px column on larger screens */}
-      <div style={{
-        position: 'absolute', left: 0, right: 0, bottom: 0,
-        maxWidth: 600, margin: '0 auto',
-        background: '#fff', borderRadius: '28px 28px 0 0',
-        boxShadow: '0 -10px 40px rgba(0,0,0,0.25)',
-        maxHeight: '88%', display: 'flex', flexDirection: 'column',
-        transform: shown ? 'translateY(0)' : 'translateY(100%)',
-        transition: 'transform .22s cubic-bezier(.2,.8,.2,1)',
-      }}>
+      <div
+        className={exiting ? 'modal-sheet-exit' : 'modal-sheet-enter'}
+        style={{
+          position: 'absolute', left: 0, right: 0, bottom: 0,
+          maxWidth: 600, margin: '0 auto',
+          background: '#fff', borderRadius: '28px 28px 0 0',
+          boxShadow: '0 -10px 40px rgba(0,0,0,0.25)',
+          maxHeight: '88%', display: 'flex', flexDirection: 'column',
+        }}
+      >
         {state.isAddingFood && !food
           ? <AddFoodForm onClose={handleClose} onAdded={handleAdded} />
           : food
