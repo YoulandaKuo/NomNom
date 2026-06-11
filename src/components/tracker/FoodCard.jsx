@@ -1,5 +1,6 @@
 import { useApp } from '../../context/AppContext'
 import { CATEGORY_MAP, REACTION_MAP } from '../../lib/preloadedFoods'
+import { EmojiImage } from '../../lib/emojiUtils.jsx'
 
 const REACTION_FACE = {
   loved:     { mood: 'love',  mouth: 'M6 13 q6 7 12 0' },
@@ -84,11 +85,12 @@ export default function FoodCard({ food, onOpen }) {
       )}
 
       {/* Emoji */}
-      <div style={{
-        fontSize: 38, lineHeight: 1,
-        filter: tried ? 'none' : 'grayscale(0.7) opacity(0.55)',
-      }}>
-        {food.emoji ?? cat?.emoji ?? '🍽️'}
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 44 }}>
+        <EmojiImage
+          emoji={food.emoji ?? cat?.emoji ?? '🍽️'}
+          size={38}
+          filter={tried ? 'none' : 'grayscale(0.7) opacity(0.55)'}
+        />
       </div>
 
       {/* Name */}
