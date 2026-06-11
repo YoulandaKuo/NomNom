@@ -15,15 +15,30 @@ export function useFoods() {
     dispatch({ type: 'SET_FOODS', foods: data })
   }
 
-  async function addCustomFood({ name, category, userId }) {
+  async function addCustomFood({ name, category, emoji, userId }) {
     const { data, error } = await supabase
       .from('foods')
-      .insert({ name, category, is_preloaded: false, user_id: userId })
+      .insert({ name, category, emoji: emoji || null, is_preloaded: false, user_id: userId })
       .select()
       .single()
     if (error) throw error
     dispatch({ type: 'ADD_FOOD', food: data })
     return data
+  }
+
+  async function updateCustomFood({ foodId, name, category, emoji, userId }) {
+    const { data, error } = await supabase
+      .from('foods')
+      .update({ name, category, emoji: emoji || null })
+      .eq('id', foodId)
+      .eq('user_id', userId)
+      .eq('is_preloaded', false)
+      .select()
+    if (error) throw error
+    const food = data?.[0]
+    if (!food) throw new Error('Could not update food.')
+    dispatch({ type: 'UPDATE_FOOD', food })
+    return food
   }
 
   async function deleteCustomFood({ foodId, userId }) {
@@ -46,5 +61,5 @@ export function useFoods() {
     dispatch({ type: 'DELETE_FOOD', foodId })
   }
 
-  return { fetchFoods, addCustomFood, deleteCustomFood }
+  return { fetchFoods, addCustomFood, updateCustomFood, deleteCustomFood }
 }

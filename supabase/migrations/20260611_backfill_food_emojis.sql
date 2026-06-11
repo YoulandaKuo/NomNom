@@ -31,7 +31,7 @@ UPDATE foods SET emoji = '🫙' WHERE name ILIKE 'Prune%'         AND is_preload
 UPDATE foods SET emoji = '🥦' WHERE name ILIKE 'Broccoli'       AND is_preloaded AND emoji IS NULL;
 UPDATE foods SET emoji = '🥕' WHERE name ILIKE 'Carrot%'        AND is_preloaded AND emoji IS NULL;
 UPDATE foods SET emoji = '🍠' WHERE name ILIKE 'Sweet Potato%'  AND is_preloaded AND emoji IS NULL;
-UPDATE foods SET emoji = '🫛' WHERE name ILIKE 'Pea%'           AND is_preloaded AND emoji IS NULL;
+UPDATE foods SET emoji = '🫛' WHERE name ILIKE 'Peas'           AND is_preloaded AND emoji IS NULL;
 UPDATE foods SET emoji = '🥬' WHERE name ILIKE 'Spinach'        AND is_preloaded AND emoji IS NULL;
 UPDATE foods SET emoji = '🌽' WHERE name ILIKE 'Corn'           AND is_preloaded AND emoji IS NULL;
 UPDATE foods SET emoji = '🥔' WHERE name ILIKE 'Potato'         AND is_preloaded AND emoji IS NULL;
@@ -47,13 +47,12 @@ UPDATE foods SET emoji = '🧄' WHERE name ILIKE 'Garlic'         AND is_preload
 UPDATE foods SET emoji = '🍄' WHERE name ILIKE 'Mushroom%'      AND is_preloaded AND emoji IS NULL;
 UPDATE foods SET emoji = '🫑' WHERE name ILIKE 'Bell Pepper%'   AND is_preloaded AND emoji IS NULL;
 UPDATE foods SET emoji = '🫑' WHERE name ILIKE 'Pepper%'        AND is_preloaded AND emoji IS NULL;
-UPDATE foods SET emoji = '🥗' WHERE name ILIKE 'Zucchini'       AND is_preloaded AND emoji IS NULL;
-UPDATE foods SET emoji = '🥗' WHERE name ILIKE 'Courgette'      AND is_preloaded AND emoji IS NULL;
+UPDATE foods SET emoji = '🥒' WHERE name ILIKE 'Zucchini'       AND is_preloaded AND emoji IS NULL;
+UPDATE foods SET emoji = '🥒' WHERE name ILIKE 'Courgette'      AND is_preloaded AND emoji IS NULL;
 UPDATE foods SET emoji = '🥜' WHERE name ILIKE 'Edamame'        AND is_preloaded AND emoji IS NULL;
-UPDATE foods SET emoji = '🥗' WHERE name ILIKE 'Asparagus'      AND is_preloaded AND emoji IS NULL;
-UPDATE foods SET emoji = '🥗' WHERE name ILIKE 'Celery'         AND is_preloaded AND emoji IS NULL;
-UPDATE foods SET emoji = '🥗' WHERE name ILIKE 'Cauliflower'    AND is_preloaded AND emoji IS NULL;
-UPDATE foods SET emoji = '🥗' WHERE name ILIKE 'Beet%'          AND is_preloaded AND emoji IS NULL;
+UPDATE foods SET emoji = '🌿' WHERE name ILIKE 'Asparagus'      AND is_preloaded AND emoji IS NULL;
+UPDATE foods SET emoji = '🌿' WHERE name ILIKE 'Celery'         AND is_preloaded AND emoji IS NULL;
+UPDATE foods SET emoji = '🥦' WHERE name ILIKE 'Cauliflower'    AND is_preloaded AND emoji IS NULL;
 UPDATE foods SET emoji = '🌿' WHERE name ILIKE 'Parsnip'        AND is_preloaded AND emoji IS NULL;
 UPDATE foods SET emoji = '🌿' WHERE name ILIKE 'Turnip'         AND is_preloaded AND emoji IS NULL;
 
@@ -84,7 +83,7 @@ UPDATE foods SET emoji = '🥛' WHERE name ILIKE 'Yogurt'         AND is_preload
 UPDATE foods SET emoji = '🥛' WHERE name ILIKE 'Yoghurt'        AND is_preloaded AND emoji IS NULL;
 UPDATE foods SET emoji = '🧀' WHERE name ILIKE 'Cheese'         AND is_preloaded AND emoji IS NULL;
 UPDATE foods SET emoji = '🧀' WHERE name ILIKE 'Cottage Cheese' AND is_preloaded AND emoji IS NULL;
-UPDATE foods SET emoji = '🍦' WHERE name ILIKE 'Butter'         AND is_preloaded AND emoji IS NULL;
+UPDATE foods SET emoji = '🧈' WHERE name ILIKE 'Butter'         AND is_preloaded AND emoji IS NULL;
 
 -- Grains
 UPDATE foods SET emoji = '🍚' WHERE name ILIKE 'Rice'           AND is_preloaded AND emoji IS NULL;

@@ -41,7 +41,7 @@ function XIcon({ size = 18 }) {
 }
 
 // ── Log form (existing food) ──────────────────────────────────────────────────
-function LogForm({ food, onClose }) {
+function LogForm({ food, onClose, onEdit }) {
   const { state } = useApp()
   const { upsertLog } = useLogs()
   const { deleteCustomFood } = useFoods()
@@ -253,15 +253,26 @@ function LogForm({ food, onClose }) {
         {error && <p style={{ color: '#ec4d3f', fontWeight: 700, fontSize: 13, marginTop: 12, marginBottom: 0 }}>{error}</p>}
 
         {canDelete && (
-          <button type="button" onClick={handleDelete} disabled={deleting}
-            style={{
-              width: '100%', marginTop: 18, padding: '13px', borderRadius: 16,
-              border: '2px solid #f6dcd8', background: '#fdeae8', color: '#ec4d3f',
-              fontFamily: '"Baloo 2", sans-serif', fontWeight: 800, fontSize: 15,
-              cursor: deleting ? 'default' : 'pointer', opacity: deleting ? 0.6 : 1,
-            }}>
-            {deleting ? 'Deleting…' : 'Delete food'}
-          </button>
+          <div style={{ display: 'flex', gap: 10, marginTop: 18 }}>
+            <button type="button" onClick={onEdit}
+              style={{
+                flex: 1, padding: '13px', borderRadius: 16,
+                border: '2px solid #e8ddd4', background: '#f3ece2', color: '#241a12',
+                fontFamily: '"Baloo 2", sans-serif', fontWeight: 800, fontSize: 15,
+                cursor: 'pointer',
+              }}>
+              Edit food
+            </button>
+            <button type="button" onClick={handleDelete} disabled={deleting}
+              style={{
+                flex: 1, padding: '13px', borderRadius: 16,
+                border: '2px solid #f6dcd8', background: '#fdeae8', color: '#ec4d3f',
+                fontFamily: '"Baloo 2", sans-serif', fontWeight: 800, fontSize: 15,
+                cursor: deleting ? 'default' : 'pointer', opacity: deleting ? 0.6 : 1,
+              }}>
+              {deleting ? 'Deleting…' : 'Delete food'}
+            </button>
+          </div>
         )}
       </div>
     </div>
@@ -274,6 +285,7 @@ function AddFoodForm({ onClose, onAdded }) {
   const { addCustomFood } = useFoods()
 
   const [name, setName] = useState('')
+  const [emoji, setEmoji] = useState('')
   const [category, setCategory] = useState(state.addFoodDefaultCategory ?? 'Fruits')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
@@ -292,7 +304,7 @@ function AddFoodForm({ onClose, onAdded }) {
     setSaving(true)
     setError('')
     try {
-      const food = await addCustomFood({ name: name.trim(), category, userId: state.user.id })
+      const food = await addCustomFood({ name: name.trim(), category, emoji: emoji.trim(), userId: state.user.id })
       onAdded(food)
     } catch (err) {
       setError(err.message)
@@ -320,6 +332,32 @@ function AddFoodForm({ onClose, onAdded }) {
                 fontFamily: '"Nunito", sans-serif', fontWeight: 700, fontSize: 15, color: '#241a12',
                 background: '#faf5ee', outline: 'none', boxSizing: 'border-box',
               }} />
+          </div>
+
+          <div>
+            <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 6 }}>
+              <div style={{ fontFamily: '"Nunito", sans-serif', fontWeight: 800, fontSize: 12, color: '#8a7d70' }}>EMOJI</div>
+              <div style={{ fontFamily: '"Nunito", sans-serif', fontWeight: 700, fontSize: 11, color: '#b0a498' }}>optional</div>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <input
+                value={emoji}
+                onChange={e => setEmoji(e.target.value)}
+                placeholder="Paste or type"
+                maxLength={2}
+                style={{
+                  flex: 1, padding: '12px 14px', borderRadius: 14, border: '2px solid #e8ddd4',
+                  fontFamily: '"Nunito", sans-serif', fontWeight: 700, fontSize: 15, color: '#241a12',
+                  background: '#faf5ee', outline: 'none', boxSizing: 'border-box',
+                }}
+              />
+              <div style={{
+                width: 48, height: 48, borderRadius: 14, background: '#f3ece2',
+                display: 'grid', placeItems: 'center', fontSize: 26, flexShrink: 0,
+              }}>
+                {emoji.trim() || '🍽️'}
+              </div>
+            </div>
           </div>
 
           <div>
@@ -360,12 +398,129 @@ function AddFoodForm({ onClose, onAdded }) {
   )
 }
 
+// ── Edit custom food form ─────────────────────────────────────────────────────
+function EditFoodForm({ food, onClose, onSaved }) {
+  const { state } = useApp()
+  const { updateCustomFood } = useFoods()
+
+  const [name, setName] = useState(food.name)
+  const [emoji, setEmoji] = useState(food.emoji ?? '')
+  const [category, setCategory] = useState(food.category)
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState('')
+
+  async function handleSubmit(e) {
+    e.preventDefault()
+    if (!name.trim()) return
+    setSaving(true)
+    setError('')
+    try {
+      const updated = await updateCustomFood({
+        foodId: food.id,
+        name: name.trim(),
+        category,
+        emoji: emoji.trim(),
+        userId: state.user.id,
+      })
+      onSaved(updated)
+    } catch (err) {
+      setError(err.message)
+      setSaving(false)
+    }
+  }
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', maxHeight: '100%' }}>
+      <div style={{ padding: '20px 18px', flex: 1, overflowY: 'auto' }} className="scrollbar-hide">
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
+          <div style={{ fontFamily: '"Baloo 2", sans-serif', fontWeight: 800, fontSize: 22, color: '#241a12' }}>Edit food</div>
+          <button onClick={onClose} style={{ width: 34, height: 34, borderRadius: '50%', background: '#f3ece2', border: 'none', cursor: 'pointer', display: 'grid', placeItems: 'center', color: '#8a7d70' }}>
+            <XIcon size={18} />
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div>
+            <div style={{ fontFamily: '"Nunito", sans-serif', fontWeight: 800, fontSize: 12, color: '#8a7d70', marginBottom: 6 }}>FOOD NAME</div>
+            <input value={name} onChange={e => setName(e.target.value)} required
+              style={{
+                width: '100%', padding: '12px 14px', borderRadius: 14, border: '2px solid #e8ddd4',
+                fontFamily: '"Nunito", sans-serif', fontWeight: 700, fontSize: 15, color: '#241a12',
+                background: '#faf5ee', outline: 'none', boxSizing: 'border-box',
+              }} />
+          </div>
+
+          <div>
+            <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 6 }}>
+              <div style={{ fontFamily: '"Nunito", sans-serif', fontWeight: 800, fontSize: 12, color: '#8a7d70' }}>EMOJI</div>
+              <div style={{ fontFamily: '"Nunito", sans-serif', fontWeight: 700, fontSize: 11, color: '#b0a498' }}>optional</div>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <input
+                value={emoji}
+                onChange={e => setEmoji(e.target.value)}
+                placeholder="Paste or type"
+                maxLength={2}
+                style={{
+                  flex: 1, padding: '12px 14px', borderRadius: 14, border: '2px solid #e8ddd4',
+                  fontFamily: '"Nunito", sans-serif', fontWeight: 700, fontSize: 15, color: '#241a12',
+                  background: '#faf5ee', outline: 'none', boxSizing: 'border-box',
+                }}
+              />
+              <div style={{
+                width: 48, height: 48, borderRadius: 14, background: '#f3ece2',
+                display: 'grid', placeItems: 'center', fontSize: 26, flexShrink: 0,
+              }}>
+                {emoji.trim() || '🍽️'}
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div style={{ fontFamily: '"Nunito", sans-serif', fontWeight: 800, fontSize: 12, color: '#8a7d70', marginBottom: 8 }}>CATEGORY</div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
+              {CATEGORIES.map(cat => (
+                <button key={cat.id} type="button" onClick={() => setCategory(cat.id)}
+                  style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
+                    padding: '8px 6px', borderRadius: 14, fontSize: 12,
+                    fontFamily: '"Baloo 2", sans-serif', fontWeight: 700,
+                    border: '2px solid',
+                    borderColor: category === cat.id ? cat.color : '#e8ddd4',
+                    background: category === cat.id ? cat.color : '#faf5ee',
+                    color: category === cat.id ? '#fff' : '#8a7d70',
+                    cursor: 'pointer', transition: 'all .12s ease',
+                  }}>
+                  <span>{cat.emoji}</span><span>{cat.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {error && <p style={{ color: '#ec4d3f', fontWeight: 700, fontSize: 13 }}>{error}</p>}
+
+          <button type="submit" disabled={saving || !name.trim()}
+            style={{
+              padding: '14px', borderRadius: 18, border: 'none', cursor: 'pointer',
+              background: !name.trim() ? '#e8ddd4' : '#241a12',
+              color: !name.trim() ? '#8a7d70' : '#fff',
+              fontFamily: '"Baloo 2", sans-serif', fontWeight: 800, fontSize: 17,
+            }}>
+            {saving ? 'Saving…' : 'Save changes'}
+          </button>
+        </form>
+      </div>
+    </div>
+  )
+}
+
 // ── Bottom sheet wrapper ──────────────────────────────────────────────────────
 const ANIM_DURATION = 280
 
 export default function FoodModal() {
   const { state, dispatch } = useApp()
   const [addedFood, setAddedFood] = useState(null)
+  const [isEditing, setIsEditing] = useState(false)
   const [visible, setVisible] = useState(false)
   const [exiting, setExiting] = useState(false)
 
@@ -377,6 +532,7 @@ export default function FoodModal() {
   useEffect(() => {
     if (isOpen) {
       setExiting(false)
+      setIsEditing(false)
       setVisible(true)
     } else if (visible) {
       setExiting(true)
@@ -393,8 +549,15 @@ export default function FoodModal() {
     setExiting(true)
     setTimeout(() => {
       setAddedFood(null)
+      setIsEditing(false)
       dispatch({ type: 'CLOSE_MODAL' })
     }, ANIM_DURATION)
+  }
+
+  function handleEditSaved(updatedFood) {
+    setAddedFood(updatedFood)
+    setIsEditing(false)
+    dispatch({ type: 'OPEN_MODAL', foodId: updatedFood.id })
   }
 
   function handleAdded(newFood) {
@@ -426,8 +589,10 @@ export default function FoodModal() {
       >
         {state.isAddingFood && !food
           ? <AddFoodForm onClose={handleClose} onAdded={handleAdded} />
+          : food && isEditing
+          ? <EditFoodForm food={food} onClose={handleClose} onSaved={handleEditSaved} />
           : food
-          ? <LogForm food={food} onClose={handleClose} />
+          ? <LogForm food={food} onClose={handleClose} onEdit={() => setIsEditing(true)} />
           : null
         }
       </div>
