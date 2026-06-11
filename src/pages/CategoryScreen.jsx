@@ -89,7 +89,7 @@ export default function CategoryScreen({ category, onBack }) {
   }, [isAll, filteredFoods, state.foods, state.logs, filter])
 
   const openFood = (foodId) => dispatch({ type: 'OPEN_MODAL', foodId })
-  const addFood  = () => dispatch({ type: 'OPEN_ADD_FOOD' })
+  const addFood  = () => dispatch({ type: 'OPEN_ADD_FOOD', category: isAll ? null : category })
 
   // ── shared grid ──────────────────────────────────────────────────
   function FoodGrid({ foods, cols = 3 }) {
