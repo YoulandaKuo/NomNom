@@ -87,7 +87,7 @@ export default function FoodCard({ food, onOpen }) {
       {/* Emoji */}
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 44 }}>
         <EmojiImage
-          emoji={food.emoji ?? cat?.emoji ?? '🍽️'}
+          emoji={food.emoji ?? '🍽️'}
           size={38}
           filter={tried ? 'none' : 'grayscale(0.7) opacity(0.55)'}
         />
