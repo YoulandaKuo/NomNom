@@ -405,7 +405,7 @@ export default function FoodModal() {
   if (!visible) return null
 
   return (
-    <div style={{ position: 'absolute', inset: 0, zIndex: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 18 }}>
+    <div style={{ position: 'fixed', inset: 0, zIndex: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 18 }}>
       {/* Backdrop — fades in over the static page */}
       <div onClick={handleClose}
         className={exiting ? 'modal-overlay-exit' : 'modal-overlay-enter'}
