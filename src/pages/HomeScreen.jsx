@@ -16,6 +16,7 @@ export default function HomeScreen({ onOpenCategory, onOpenSettings }) {
   const { state } = useApp()
   const { signOut } = useAuth()
   const [menuOpen, setMenuOpen] = useState(false)
+  const [confirmLogout, setConfirmLogout] = useState(false)
   const menuRef = useRef(null)
 
   useEffect(() => {
@@ -81,7 +82,7 @@ export default function HomeScreen({ onOpenCategory, onOpenSettings }) {
                 <span>Settings</span>
               </button>
               <button role="menuitem"
-                onClick={() => { setMenuOpen(false); signOut() }}
+                onClick={() => { setMenuOpen(false); setConfirmLogout(true) }}
                 style={menuItemStyle}
                 onPointerEnter={e => e.currentTarget.style.background = '#f6efe6'}
                 onPointerLeave={e => e.currentTarget.style.background = 'transparent'}>
@@ -156,6 +157,45 @@ export default function HomeScreen({ onOpenCategory, onOpenSettings }) {
           </button>
         ))}
       </div>
+
+      {confirmLogout && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 60, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 18 }}>
+          <div onClick={() => setConfirmLogout(false)}
+            style={{ position: 'absolute', inset: 0, background: 'rgba(36,26,18,0.5)' }} />
+          <div role="dialog" aria-modal="true" aria-label="Log out"
+            style={{
+              position: 'relative', width: '100%', maxWidth: 360,
+              background: '#fff', borderRadius: 24, padding: '24px 22px',
+              boxShadow: '0 20px 60px rgba(0,0,0,0.3)', textAlign: 'center',
+            }}>
+            <div style={{ fontSize: 36 }}>👋</div>
+            <div style={{ fontFamily: '"Baloo 2", sans-serif', fontWeight: 800, fontSize: 21, color: '#241a12', marginTop: 6 }}>
+              Log out?
+            </div>
+            <div style={{ fontFamily: '"Nunito", sans-serif', fontWeight: 600, fontSize: 15, color: '#8a7d70', marginTop: 6, lineHeight: 1.4 }}>
+              You'll need to sign back in to keep tracking.
+            </div>
+            <div style={{ display: 'flex', gap: 10, marginTop: 20 }}>
+              <button onClick={() => setConfirmLogout(false)}
+                style={{
+                  flex: 1, padding: '13px 16px', borderRadius: 14, border: 'none', cursor: 'pointer',
+                  fontFamily: '"Baloo 2", sans-serif', fontWeight: 800, fontSize: 16,
+                  color: '#241a12', background: '#f3ece2',
+                }}>
+                Cancel
+              </button>
+              <button onClick={() => { setConfirmLogout(false); signOut() }}
+                style={{
+                  flex: 1, padding: '13px 16px', borderRadius: 14, border: 'none', cursor: 'pointer',
+                  fontFamily: '"Baloo 2", sans-serif', fontWeight: 800, fontSize: 16,
+                  color: '#fff', background: '#ec4d3f',
+                }}>
+                Log out
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
