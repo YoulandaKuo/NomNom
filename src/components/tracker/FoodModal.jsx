@@ -44,9 +44,25 @@ function XIcon({ size = 18 }) {
 function LogForm({ food, onClose }) {
   const { state } = useApp()
   const { upsertLog } = useLogs()
+  const { deleteCustomFood } = useFoods()
   const existing = state.logs[food.id]
   const cat = CATEGORY_MAP[food.category] ?? CATEGORIES[0]
   const today = format(new Date(), 'yyyy-MM-dd')
+  const canDelete = !food.is_preloaded && food.user_id === state.user.id
+  const [deleting, setDeleting] = useState(false)
+
+  async function handleDelete() {
+    if (!window.confirm(`Delete "${food.name}"? This can't be undone.`)) return
+    setDeleting(true)
+    setError('')
+    try {
+      await deleteCustomFood({ foodId: food.id, userId: state.user.id })
+      onClose()
+    } catch (err) {
+      setError(err.message)
+      setDeleting(false)
+    }
+  }
 
   const stored = existing?.reaction ?? 'not_tried'
   const [tried, setTried] = useState(stored !== 'not_tried')
@@ -100,16 +116,13 @@ function LogForm({ food, onClose }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', maxHeight: '100%' }}>
-      {/* Handle bar */}
-      <div style={{ width: 44, height: 5, borderRadius: 3, background: '#e3d7c8', margin: '10px auto 14px', flexShrink: 0 }} />
-
       {/* Title row */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 13, marginBottom: 18, padding: '0 18px', flexShrink: 0 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 13, margin: '18px 0', padding: '0 18px', flexShrink: 0 }}>
         <div style={{
           width: 62, height: 62, flexShrink: 0, borderRadius: 20,
           background: cat.tint, display: 'grid', placeItems: 'center', fontSize: 36,
         }}>
-          {food.emoji ?? cat.emoji}
+          {food.emoji ?? '🍽️'}
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontFamily: '"Baloo 2", sans-serif', fontWeight: 800, fontSize: 24, lineHeight: 1, color: '#241a12' }}>
@@ -237,6 +250,18 @@ function LogForm({ food, onClose }) {
         )}
 
         {error && <p style={{ color: '#ec4d3f', fontWeight: 700, fontSize: 13, marginTop: 12, marginBottom: 0 }}>{error}</p>}
+
+        {canDelete && (
+          <button type="button" onClick={handleDelete} disabled={deleting}
+            style={{
+              width: '100%', marginTop: 18, padding: '13px', borderRadius: 16,
+              border: '2px solid #f6dcd8', background: '#fdeae8', color: '#ec4d3f',
+              fontFamily: '"Baloo 2", sans-serif', fontWeight: 800, fontSize: 15,
+              cursor: deleting ? 'default' : 'pointer', opacity: deleting ? 0.6 : 1,
+            }}>
+            {deleting ? 'Deleting…' : 'Delete food'}
+          </button>
+        )}
       </div>
     </div>
   )
@@ -253,10 +278,10 @@ function AddFoodForm({ onClose, onAdded }) {
   const [error, setError] = useState('')
   const nameRef = useRef(null)
 
-  // Focus the name field only after the sheet has slid into place, and without
-  // letting the browser scroll the page to chase the (initially off-screen) input.
+  // Focus the name field once the modal has popped into place, without letting
+  // the browser scroll the page to chase the input.
   useEffect(() => {
-    const t = setTimeout(() => nameRef.current?.focus({ preventScroll: true }), 320)
+    const t = setTimeout(() => nameRef.current?.focus({ preventScroll: true }), 300)
     return () => clearTimeout(t)
   }, [])
 
@@ -276,8 +301,7 @@ function AddFoodForm({ onClose, onAdded }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', maxHeight: '100%' }}>
-      <div style={{ width: 44, height: 5, borderRadius: 3, background: '#e3d7c8', margin: '10px auto 0', flexShrink: 0 }} />
-      <div style={{ padding: '16px 18px 20px', flex: 1, overflowY: 'auto' }} className="scrollbar-hide">
+      <div style={{ padding: '20px 18px', flex: 1, overflowY: 'auto' }} className="scrollbar-hide">
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
           <div style={{ fontFamily: '"Baloo 2", sans-serif', fontWeight: 800, fontSize: 22, color: '#241a12' }}>Add a food</div>
           <button onClick={onClose} style={{ width: 34, height: 34, borderRadius: '50%', background: '#f3ece2', border: 'none', cursor: 'pointer', display: 'grid', placeItems: 'center', color: '#8a7d70' }}>
@@ -381,21 +405,22 @@ export default function FoodModal() {
   if (!visible) return null
 
   return (
-    <div style={{ position: 'absolute', inset: 0, zIndex: 6 }}>
-      {/* Backdrop — fades in over the static page, sheet stays put underneath */}
+    <div style={{ position: 'absolute', inset: 0, zIndex: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 18 }}>
+      {/* Backdrop — fades in over the static page */}
       <div onClick={handleClose}
         className={exiting ? 'modal-overlay-exit' : 'modal-overlay-enter'}
         style={{ position: 'absolute', inset: 0, background: 'rgba(36,26,18,0.5)' }}
       />
-      {/* Sheet — full-width on mobile, centered 600px column on larger screens */}
+      {/* Modal — centered card that pops in over the overlay */}
       <div
         className={exiting ? 'modal-sheet-exit' : 'modal-sheet-enter'}
         style={{
-          position: 'absolute', left: 0, right: 0, bottom: 0,
-          maxWidth: 600, margin: '0 auto',
-          background: '#fff', borderRadius: '28px 28px 0 0',
-          boxShadow: '0 -10px 40px rgba(0,0,0,0.25)',
+          position: 'relative',
+          width: '100%', maxWidth: 460,
+          background: '#fff', borderRadius: 28,
+          boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
           maxHeight: '88%', display: 'flex', flexDirection: 'column',
+          overflow: 'hidden',
         }}
       >
         {state.isAddingFood && !food

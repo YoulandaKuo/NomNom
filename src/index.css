@@ -53,6 +53,14 @@
   from { opacity: 1; }
   to   { opacity: 0; }
 }
+@keyframes modal-pop-in {
+  from { opacity: 0; transform: scale(0.92) translateY(12px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+@keyframes modal-pop-out {
+  from { opacity: 1; transform: scale(1) translateY(0); }
+  to   { opacity: 0; transform: scale(0.96) translateY(8px); }
+}
 
 .modal-overlay-enter {
   animation: fade-in 0.25s ease forwards;
@@ -61,10 +69,10 @@
   animation: fade-out 0.22s ease forwards;
 }
 .modal-sheet-enter {
-  animation: slide-up 0.32s cubic-bezier(0.32, 0.72, 0, 1) forwards;
+  animation: modal-pop-in 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 .modal-sheet-exit {
-  animation: slide-down 0.25s cubic-bezier(0.32, 0.72, 0, 1) forwards;
+  animation: modal-pop-out 0.2s ease forwards;
 }
 
 .scrollbar-hide {

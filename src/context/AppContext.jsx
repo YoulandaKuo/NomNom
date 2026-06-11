@@ -23,6 +23,10 @@ function reducer(state, action) {
       return { ...state, foods: action.foods, loading: { ...state.loading, foods: false } }
     case 'ADD_FOOD':
       return { ...state, foods: [...state.foods, action.food] }
+    case 'DELETE_FOOD': {
+      const { [action.foodId]: _removed, ...logs } = state.logs
+      return { ...state, foods: state.foods.filter(f => f.id !== action.foodId), logs }
+    }
     case 'SET_LOGS':
       return { ...state, logs: action.logs, loading: { ...state.loading, logs: false } }
     case 'UPSERT_LOG':
