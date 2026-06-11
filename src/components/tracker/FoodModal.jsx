@@ -3,7 +3,7 @@ import { format, parseISO } from 'date-fns'
 import { useApp } from '../../context/AppContext'
 import { useFoods } from '../../hooks/useFoods'
 import { useLogs } from '../../hooks/useLogs'
-import { REACTION_MAP, CATEGORIES, CATEGORY_MAP, MOODS, BABY_NAME } from '../../lib/preloadedFoods'
+import { REACTION_MAP, CATEGORIES, CATEGORY_MAP, MOODS } from '../../lib/preloadedFoods'
 
 const REACTION_FACE = {
   loved:     { mouth: 'M6 13 q6 7 12 0', eyeY: 9.5, hearts: true },
@@ -49,6 +49,7 @@ function LogForm({ food, onClose }) {
   const cat = CATEGORY_MAP[food.category] ?? CATEGORIES[0]
   const today = format(new Date(), 'yyyy-MM-dd')
   const canDelete = !food.is_preloaded && food.user_id === state.user.id
+  const babyName = state.babyName || 'your baby'
   const [deleting, setDeleting] = useState(false)
 
   async function handleDelete() {
@@ -176,7 +177,7 @@ function LogForm({ food, onClose }) {
             {/* Mood picker */}
             <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 10 }}>
               <div style={{ fontFamily: '"Baloo 2", sans-serif', fontWeight: 800, fontSize: 17, color: '#241a12' }}>
-                How did {BABY_NAME} like it?
+                How did {babyName} like it?
               </div>
               <div style={{ fontFamily: '"Nunito", sans-serif', fontWeight: 700, fontSize: 13, color: '#8a7d70' }}>
                 optional
@@ -245,7 +246,7 @@ function LogForm({ food, onClose }) {
             background: '#f6efe6', borderRadius: 20, padding: '18px 20px', textAlign: 'center',
             fontFamily: '"Nunito", sans-serif', fontWeight: 700, fontSize: 15, lineHeight: 1.5, color: '#8a7d70',
           }}>
-            {food.name} is still on the list — mark it tried when {BABY_NAME} takes the first taste.
+            {food.name} is still on the list — mark it tried when {babyName} takes the first taste.
           </div>
         )}
 

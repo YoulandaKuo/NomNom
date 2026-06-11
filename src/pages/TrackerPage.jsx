@@ -4,6 +4,7 @@ import { useFoods } from '../hooks/useFoods'
 import { useLogs } from '../hooks/useLogs'
 import HomeScreen from './HomeScreen'
 import CategoryScreen from './CategoryScreen'
+import SettingsScreen from './SettingsScreen'
 import FoodModal from '../components/tracker/FoodModal'
 
 export default function TrackerPage() {
@@ -27,10 +28,15 @@ export default function TrackerPage() {
 
   return (
     <div style={{ width: '100%', minHeight: '100dvh', background: '#fff6ee', display: 'flex', flexDirection: 'column', position: 'relative' }}>
-      {screen === 'home'
-        ? <HomeScreen onOpenCategory={openCategory} />
-        : <CategoryScreen category={activeCategory} onBack={() => setScreen('home')} />
-      }
+      {screen === 'home' && (
+        <HomeScreen onOpenCategory={openCategory} onOpenSettings={() => setScreen('settings')} />
+      )}
+      {screen === 'category' && (
+        <CategoryScreen category={activeCategory} onBack={() => setScreen('home')} />
+      )}
+      {screen === 'settings' && (
+        <SettingsScreen onBack={() => setScreen('home')} />
+      )}
       <FoodModal />
     </div>
   )

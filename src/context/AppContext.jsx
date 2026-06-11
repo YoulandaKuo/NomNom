@@ -8,6 +8,7 @@ const initialState = {
   session: null,
   foods: [],
   logs: {},            // { [food_id]: { id, reaction, date_tried, notes } }
+  babyName: localStorage.getItem('baby_name') || '',
   activeCategory: 'All',
   modalFoodId: null,
   isAddingFood: false,
@@ -39,6 +40,9 @@ function reducer(state, action) {
       return { ...state, modalFoodId: null, isAddingFood: true, addFoodDefaultCategory: action.category ?? null }
     case 'CLOSE_MODAL':
       return { ...state, modalFoodId: null, isAddingFood: false, addFoodDefaultCategory: null }
+    case 'SET_BABY_NAME':
+      localStorage.setItem('baby_name', action.name)
+      return { ...state, babyName: action.name }
     case 'SET_LOADING':
       return { ...state, loading: { ...state.loading, ...action.loading } }
     default:

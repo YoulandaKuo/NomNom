@@ -1,12 +1,31 @@
-import { useMemo } from 'react'
-import { LogOut } from 'lucide-react'
+import { useMemo, useState, useEffect, useRef } from 'react'
+import { LogOut, MoreVertical, Settings } from 'lucide-react'
 import { useApp } from '../context/AppContext'
 import { useAuth } from '../hooks/useAuth'
 import { CATEGORIES } from '../lib/preloadedFoods'
 
-export default function HomeScreen({ onOpenCategory }) {
+const menuItemStyle = {
+  display: 'flex', alignItems: 'center', gap: 10, width: '100%',
+  padding: '10px 12px', borderRadius: 11, border: 'none', cursor: 'pointer',
+  background: 'transparent', textAlign: 'left',
+  fontFamily: '"Nunito", sans-serif', fontWeight: 700, fontSize: 15, color: '#241a12',
+  transition: 'background .12s ease',
+}
+
+export default function HomeScreen({ onOpenCategory, onOpenSettings }) {
   const { state } = useApp()
   const { signOut } = useAuth()
+  const [menuOpen, setMenuOpen] = useState(false)
+  const menuRef = useRef(null)
+
+  useEffect(() => {
+    if (!menuOpen) return
+    function handleClick(e) {
+      if (menuRef.current && !menuRef.current.contains(e.target)) setMenuOpen(false)
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [menuOpen])
 
   const variety = useMemo(
     () => Object.values(state.logs).filter(l => l.reaction !== 'not_tried').length,
@@ -39,11 +58,39 @@ export default function HomeScreen({ onOpenCategory }) {
             Nom Nom
           </div>
         </div>
-        <button onClick={signOut}
-          style={{ width: 34, height: 34, borderRadius: '50%', background: 'rgba(36,26,18,0.08)', border: 'none', cursor: 'pointer', display: 'grid', placeItems: 'center', color: '#8a7d70' }}
-          aria-label="Sign out">
-          <LogOut size={16} />
-        </button>
+        <div ref={menuRef} style={{ position: 'relative' }}>
+          <button onClick={() => setMenuOpen(o => !o)}
+            style={{ width: 34, height: 34, borderRadius: '50%', background: 'rgba(36,26,18,0.08)', border: 'none', cursor: 'pointer', display: 'grid', placeItems: 'center', color: '#8a7d70' }}
+            aria-label="More options" aria-haspopup="menu" aria-expanded={menuOpen}>
+            <MoreVertical size={18} />
+          </button>
+
+          {menuOpen && (
+            <div role="menu"
+              style={{
+                position: 'absolute', top: 42, right: 0, minWidth: 168, zIndex: 50,
+                background: '#fff', borderRadius: 16, padding: 6,
+                boxShadow: '0 12px 32px rgba(36,26,18,0.18)', border: '1px solid #f0e7dc',
+              }}>
+              <button role="menuitem"
+                onClick={() => { setMenuOpen(false); onOpenSettings() }}
+                style={menuItemStyle}
+                onPointerEnter={e => e.currentTarget.style.background = '#f6efe6'}
+                onPointerLeave={e => e.currentTarget.style.background = 'transparent'}>
+                <Settings size={17} color="#8a7d70" />
+                <span>Settings</span>
+              </button>
+              <button role="menuitem"
+                onClick={() => { setMenuOpen(false); signOut() }}
+                style={menuItemStyle}
+                onPointerEnter={e => e.currentTarget.style.background = '#f6efe6'}
+                onPointerLeave={e => e.currentTarget.style.background = 'transparent'}>
+                <LogOut size={17} color="#8a7d70" />
+                <span>Log out</span>
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Variety hero — tap to browse all */}

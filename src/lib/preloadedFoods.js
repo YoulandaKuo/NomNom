@@ -24,8 +24,6 @@ export const REACTION_MAP = Object.fromEntries(REACTIONS.map(r => [r.value, r]))
 // 'allergic' is kept above so legacy logs still render)
 export const MOODS = ['loved', 'meh', 'neutral']
 
-export const BABY_NAME = 'Remi'
-
 export const MILESTONES = [
   { count: 5,   message: "Hoji is paying attention! 👀" },
   { count: 10,  message: "Hoji is impressed! 🦔✨" },
