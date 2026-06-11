@@ -5,7 +5,7 @@ import { CATEGORIES } from '../../lib/preloadedFoods'
 import FoodCard from './FoodCard'
 
 function CategorySection({ cat, foods }) {
-  const { dispatch } = useApp()
+  const { state, dispatch } = useApp()
 
   if (foods.length === 0 && cat) return null
 
@@ -22,7 +22,7 @@ function CategorySection({ cat, foods }) {
         {foods.map(food => <FoodCard key={food.id} food={food} />)}
         {/* Add food tile */}
         <button
-          onClick={() => dispatch({ type: 'OPEN_ADD_FOOD' })}
+          onClick={() => dispatch({ type: 'OPEN_ADD_FOOD', category: cat?.id ?? (state.activeCategory !== 'All' ? state.activeCategory : null) })}
           className="flex flex-col items-center justify-center gap-1 p-3 rounded-2xl aspect-square border-2 border-dashed border-slate-300 text-slate-400 hover:border-orange-300 hover:text-orange-400 transition-all active:scale-95"
           aria-label="Add custom food"
         >

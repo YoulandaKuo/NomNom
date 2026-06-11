@@ -248,7 +248,7 @@ function AddFoodForm({ onClose, onAdded }) {
   const { addCustomFood } = useFoods()
 
   const [name, setName] = useState('')
-  const [category, setCategory] = useState('Fruits')
+  const [category, setCategory] = useState(state.addFoodDefaultCategory ?? 'Fruits')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 

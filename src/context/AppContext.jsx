@@ -11,6 +11,7 @@ const initialState = {
   activeCategory: 'All',
   modalFoodId: null,
   isAddingFood: false,
+  addFoodDefaultCategory: null,
   loading: { auth: true, foods: false, logs: false },
 }
 
@@ -31,9 +32,9 @@ function reducer(state, action) {
     case 'OPEN_MODAL':
       return { ...state, modalFoodId: action.foodId, isAddingFood: false }
     case 'OPEN_ADD_FOOD':
-      return { ...state, modalFoodId: null, isAddingFood: true }
+      return { ...state, modalFoodId: null, isAddingFood: true, addFoodDefaultCategory: action.category ?? null }
     case 'CLOSE_MODAL':
-      return { ...state, modalFoodId: null, isAddingFood: false }
+      return { ...state, modalFoodId: null, isAddingFood: false, addFoodDefaultCategory: null }
     case 'SET_LOADING':
       return { ...state, loading: { ...state.loading, ...action.loading } }
     default:
