@@ -60,8 +60,8 @@ export default function FoodCard({ food, onOpen }) {
         position: 'relative', cursor: 'pointer',
         background: '#fff',
         border: tried ? '2px solid #f1e7da' : '2px dashed #e2d4c4',
-        boxShadow: tried ? '0 3px 10px rgba(190,150,110,0.14)' : 'none',
-        opacity: tried ? 1 : 0.94,
+        boxShadow: tried ? 'none' : '0 3px 10px rgba(190,150,110,0.14)',
+        opacity: tried ? 0.7 : 1,
         transition: 'transform .1s ease',
       }}
       onPointerDown={e => e.currentTarget.style.transform = 'scale(0.95)'}
@@ -87,16 +87,16 @@ export default function FoodCard({ food, onOpen }) {
       {/* Emoji */}
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 44 }}>
         <EmojiImage
-          emoji={food.emoji ?? '🍽️'}
+          emoji={food.emoji ?? food.name?.[0] ?? '🍽️'}
           size={38}
-          filter={tried ? 'none' : 'grayscale(0.7) opacity(0.55)'}
+          filter={tried ? 'grayscale(0.7) opacity(0.55)' : 'none'}
         />
       </div>
 
       {/* Name */}
       <div style={{
         fontFamily: '"Baloo 2", sans-serif', fontWeight: 700, fontSize: 13,
-        marginTop: 6, color: tried ? '#241a12' : '#8a7d70', lineHeight: 1.2,
+        marginTop: 6, color: tried ? '#8a7d70' : '#241a12', lineHeight: 1.2,
         overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
       }}>
         {food.name}
@@ -105,7 +105,7 @@ export default function FoodCard({ food, onOpen }) {
       {/* Reaction label */}
       <div style={{
         fontFamily: '"Nunito", sans-serif', fontWeight: 800, fontSize: 11,
-        color: tried ? rc : '#c4b4a3', marginTop: 1,
+        color: tried ? '#c4b4a3' : '#8a7d70', marginTop: 1,
       }}>
         {tried ? (REACTION_MAP[reaction]?.label ?? reaction) : 'tap to log'}
       </div>

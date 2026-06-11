@@ -123,7 +123,7 @@ function LogForm({ food, onClose, onEdit }) {
           width: 62, height: 62, flexShrink: 0, borderRadius: 20,
           background: cat.tint, display: 'grid', placeItems: 'center', fontSize: 36,
         }}>
-          {food.emoji ?? '🍽️'}
+          {food.emoji ?? food.name?.[0] ?? '🍽️'}
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontFamily: '"Baloo 2", sans-serif', fontWeight: 800, fontSize: 24, lineHeight: 1, color: '#241a12' }}>
@@ -355,7 +355,7 @@ function AddFoodForm({ onClose, onAdded }) {
                 width: 48, height: 48, borderRadius: 14, background: '#f3ece2',
                 display: 'grid', placeItems: 'center', fontSize: 26, flexShrink: 0,
               }}>
-                {emoji.trim() || '🍽️'}
+                {emoji.trim() || name?.[0] || '🍽️'}
               </div>
             </div>
           </div>
@@ -471,7 +471,7 @@ function EditFoodForm({ food, onClose, onSaved }) {
                 width: 48, height: 48, borderRadius: 14, background: '#f3ece2',
                 display: 'grid', placeItems: 'center', fontSize: 26, flexShrink: 0,
               }}>
-                {emoji.trim() || '🍽️'}
+                {emoji.trim() || name?.[0] || '🍽️'}
               </div>
             </div>
           </div>
