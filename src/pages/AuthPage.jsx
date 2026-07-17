@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import { useAuth } from '../hooks/useAuth'
+import { useT } from '../lib/i18n'
 
 export default function AuthPage() {
   const { signIn, signUp } = useAuth()
+  const t = useT()
   const [mode, setMode] = useState('signin')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -18,7 +20,7 @@ export default function AuthPage() {
     try {
       if (mode === 'signup') {
         await signUp(email, password)
-        setSuccess('Account created! Check your email to confirm, then sign in.')
+        setSuccess(t('auth.accountCreated'))
         setMode('signin')
       } else {
         await signIn(email, password)
@@ -50,25 +52,25 @@ export default function AuthPage() {
             Nom Nom
           </h1>
           <p style={{ fontFamily: '"Nunito", sans-serif', fontWeight: 700, fontSize: 14, color: '#8a7d70', margin: 0 }}>
-            Your baby's food adventure tracker
+            {t('auth.tagline')}
           </p>
         </div>
 
         {/* Card */}
         <div style={{ background: '#fff', borderRadius: 28, padding: '24px 24px 28px', boxShadow: '0 8px 32px rgba(60,40,20,0.12)' }}>
           <h2 style={{ fontFamily: '"Baloo 2", sans-serif', fontWeight: 800, fontSize: 20, color: '#241a12', margin: '0 0 20px' }}>
-            {mode === 'signin' ? 'Welcome back 👋' : 'Create account 🎉'}
+            {mode === 'signin' ? t('auth.welcomeBack') : t('auth.createAccount')}
           </h2>
 
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
             <div>
-              <div style={{ fontFamily: '"Nunito", sans-serif', fontWeight: 800, fontSize: 12, color: '#8a7d70', marginBottom: 6 }}>EMAIL</div>
+              <div style={{ fontFamily: '"Nunito", sans-serif', fontWeight: 800, fontSize: 12, color: '#8a7d70', marginBottom: 6 }}>{t('auth.email')}</div>
               <input type="email" placeholder="you@example.com" value={email} onChange={e => setEmail(e.target.value)}
                 required autoComplete="email" style={inputStyle} />
             </div>
             <div>
-              <div style={{ fontFamily: '"Nunito", sans-serif', fontWeight: 800, fontSize: 12, color: '#8a7d70', marginBottom: 6 }}>PASSWORD</div>
-              <input type="password" placeholder={mode === 'signup' ? 'Min. 6 characters' : '••••••••'}
+              <div style={{ fontFamily: '"Nunito", sans-serif', fontWeight: 800, fontSize: 12, color: '#8a7d70', marginBottom: 6 }}>{t('auth.password')}</div>
+              <input type="password" placeholder={mode === 'signup' ? t('auth.passwordMinPlaceholder') : '••••••••'}
                 value={password} onChange={e => setPassword(e.target.value)}
                 required minLength={6}
                 autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
@@ -93,15 +95,15 @@ export default function AuthPage() {
                 fontFamily: '"Baloo 2", sans-serif', fontWeight: 800, fontSize: 17,
                 marginTop: 4, opacity: loading ? 0.7 : 1,
               }}>
-              {loading ? 'Please wait…' : mode === 'signin' ? 'Sign in' : 'Create account'}
+              {loading ? t('auth.pleaseWait') : mode === 'signin' ? t('auth.signIn') : t('auth.createAccount')}
             </button>
           </form>
 
           <p style={{ textAlign: 'center', fontFamily: '"Nunito", sans-serif', fontSize: 13, fontWeight: 700, color: '#8a7d70', marginTop: 16, marginBottom: 0 }}>
-            {mode === 'signin' ? "Don't have an account? " : 'Already have an account? '}
+            {mode === 'signin' ? t('auth.noAccount') : t('auth.hasAccount')}
             <button onClick={() => { setMode(mode === 'signin' ? 'signup' : 'signin'); setError(''); setSuccess('') }}
               style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: '"Baloo 2", sans-serif', fontWeight: 800, fontSize: 13, color: '#ff7d24' }}>
-              {mode === 'signin' ? 'Sign up' : 'Sign in'}
+              {mode === 'signin' ? t('auth.signUp') : t('auth.signIn')}
             </button>
           </p>
         </div>

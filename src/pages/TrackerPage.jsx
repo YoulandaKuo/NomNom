@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useApp } from '../context/AppContext'
 import { useFoods } from '../hooks/useFoods'
 import { useLogs } from '../hooks/useLogs'
+import { useProfile } from '../hooks/useProfile'
 import HomeScreen from './HomeScreen'
 import CategoryScreen from './CategoryScreen'
 import SettingsScreen from './SettingsScreen'
@@ -11,6 +12,7 @@ export default function TrackerPage() {
   const { state } = useApp()
   const { fetchFoods } = useFoods()
   const { fetchLogs } = useLogs()
+  const { fetchProfile } = useProfile()
   const [screen, setScreen] = useState('home')
   const [activeCategory, setActiveCategory] = useState('all')
 
@@ -18,6 +20,7 @@ export default function TrackerPage() {
     if (state.user) {
       fetchFoods(state.user.id)
       fetchLogs(state.user.id)
+      fetchProfile(state.user.id)
     }
   }, [state.user?.id]) // eslint-disable-line react-hooks/exhaustive-deps
 

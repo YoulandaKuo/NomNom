@@ -1,9 +1,10 @@
 import { useMemo, useState } from 'react'
 import { useApp } from '../context/AppContext'
 import { CATEGORIES, CATEGORY_MAP } from '../lib/preloadedFoods'
+import { useT } from '../lib/i18n'
 import FoodCard from '../components/tracker/FoodCard'
 
-const ALL_META = { label: 'All foods', emoji: '🍴', color: '#241a12', dk: '#1a120b', tint: '#f3ece2' }
+const ALL_META = { emoji: '🍴', color: '#241a12', dk: '#1a120b', tint: '#f3ece2' }
 
 function BackIcon() {
   return (
@@ -22,10 +23,11 @@ function ProgressBar({ tried, total, color }) {
 }
 
 function FilterTabs({ filter, setFilter, tried, total, color, dk, tint }) {
+  const t = useT()
   const tabs = [
-    { key: 'all',   label: 'All',      count: total },
-    { key: 'tried', label: 'Tried',    count: tried },
-    { key: 'new',   label: 'Not yet',  count: total - tried },
+    { key: 'all',   label: t('category.all'),    count: total },
+    { key: 'tried', label: t('category.tried'),  count: tried },
+    { key: 'new',   label: t('category.notYet'), count: total - tried },
   ]
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
@@ -53,9 +55,11 @@ function FilterTabs({ filter, setFilter, tried, total, color, dk, tint }) {
 
 export default function CategoryScreen({ category, onBack }) {
   const { state, dispatch } = useApp()
+  const t = useT()
   const [filter, setFilter] = useState('all')
   const isAll = category === 'all'
   const m = isAll ? ALL_META : (CATEGORY_MAP[category] ?? ALL_META)
+  const mLabel = isAll ? t('category.allFoods') : t('categoryLabel.' + (CATEGORY_MAP[category]?.id ?? category))
 
   const allFoods = useMemo(() => {
     if (isAll) return state.foods
@@ -107,7 +111,7 @@ export default function CategoryScreen({ category, onBack }) {
               minHeight: 96,
             }}>
             <span style={{ fontSize: 22 }}>➕</span>
-            <span style={{ fontFamily: '"Baloo 2", sans-serif', fontWeight: 700, fontSize: 12, color: '#8a7d70' }}>Add</span>
+            <span style={{ fontFamily: '"Baloo 2", sans-serif', fontWeight: 700, fontSize: 12, color: '#8a7d70' }}>{t('category.add')}</span>
           </button>
         )}
       </div>
@@ -123,7 +127,7 @@ export default function CategoryScreen({ category, onBack }) {
             <div key={cat.id}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 9 }}>
                 <span style={{ width: 10, height: 10, borderRadius: '50%', background: cat.color, flexShrink: 0 }} />
-                <span style={{ fontFamily: '"Baloo 2", sans-serif', fontWeight: 800, fontSize: 16, color: '#241a12' }}>{cat.label}</span>
+                <span style={{ fontFamily: '"Baloo 2", sans-serif', fontWeight: 800, fontSize: 16, color: '#241a12' }}>{t('categoryLabel.' + cat.id)}</span>
                 <span style={{ fontFamily: '"Nunito", sans-serif', fontWeight: 800, fontSize: 12, color: '#8a7d70' }}>{catTried}/{state.foods.filter(f => f.category === cat.id).length}</span>
               </div>
               <FoodGrid foods={foods} cols={cols} />
@@ -142,14 +146,14 @@ export default function CategoryScreen({ category, onBack }) {
         <button onClick={onBack} aria-label="Back to Food groups"
           style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#8a7d70', background: 'none', border: 'none', cursor: 'pointer', padding: 0, marginBottom: 14 }}>
           <BackIcon />
-          <span style={{ fontFamily: '"Nunito", sans-serif', fontWeight: 700, fontSize: 14 }}>Food groups</span>
+          <span style={{ fontFamily: '"Nunito", sans-serif', fontWeight: 700, fontSize: 14 }}>{t('category.foodGroups')}</span>
         </button>
 
         <div style={{ fontFamily: '"Baloo 2", sans-serif', fontSize: 32, fontWeight: 800, lineHeight: 1, color: '#241a12' }}>
-          {m.label} {m.emoji}
+          {mLabel} {m.emoji}
         </div>
         <div style={{ fontFamily: '"Nunito", sans-serif', fontWeight: 700, fontSize: 14, color: '#8a7d70', marginTop: 5 }}>
-          {tried} of {total} tried · {toGo} to go
+          {t('category.triedOfToGo', { tried, total, toGo })}
         </div>
         {!isAll && (
           <div style={{ marginTop: 12 }}>
@@ -160,7 +164,7 @@ export default function CategoryScreen({ category, onBack }) {
         {/* Filter tabs — horizontal on mobile */}
         {!isAll && (
           <div style={{ display: 'flex', gap: 6, marginTop: 14 }}>
-            {[['all', 'All', total], ['tried', 'Tried', tried], ['new', 'Not yet', toGo]].map(([key, label, count]) => {
+            {[['all', t('category.all'), total], ['tried', t('category.tried'), tried], ['new', t('category.notYet'), toGo]].map(([key, label, count]) => {
               const active = filter === key
               return (
                 <button key={key} onClick={() => setFilter(key)}
@@ -201,13 +205,13 @@ export default function CategoryScreen({ category, onBack }) {
         <button onClick={onBack} aria-label="Back to Food groups"
           style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#8a7d70', background: 'none', border: 'none', cursor: 'pointer', padding: 0, marginBottom: 22 }}>
           <BackIcon />
-          <span style={{ fontFamily: '"Nunito", sans-serif', fontWeight: 700, fontSize: 14 }}>Food groups</span>
+          <span style={{ fontFamily: '"Nunito", sans-serif', fontWeight: 700, fontSize: 14 }}>{t('category.foodGroups')}</span>
         </button>
 
         <div style={{ fontSize: 44, lineHeight: 1, marginBottom: 6 }}>{m.emoji}</div>
-        <div style={{ fontFamily: '"Baloo 2", sans-serif', fontSize: 28, fontWeight: 800, lineHeight: 1.1, color: '#241a12', marginBottom: 5 }}>{m.label}</div>
+        <div style={{ fontFamily: '"Baloo 2", sans-serif', fontSize: 28, fontWeight: 800, lineHeight: 1.1, color: '#241a12', marginBottom: 5 }}>{mLabel}</div>
         <div style={{ fontFamily: '"Nunito", sans-serif', fontWeight: 700, fontSize: 13, color: '#8a7d70', marginBottom: 11 }}>
-          {tried} of {total} tried
+          {t('category.triedOf', { tried, total })}
         </div>
         {!isAll && <ProgressBar tried={tried} total={total} color={m.color} />}
 

@@ -9,6 +9,7 @@ const initialState = {
   foods: [],
   logs: {},            // { [food_id]: { id, reaction, date_tried, notes } }
   babyName: localStorage.getItem('baby_name') || '',
+  language: localStorage.getItem('language') || 'en',
   activeCategory: 'All',
   modalFoodId: null,
   isAddingFood: false,
@@ -45,6 +46,9 @@ function reducer(state, action) {
     case 'SET_BABY_NAME':
       localStorage.setItem('baby_name', action.name)
       return { ...state, babyName: action.name }
+    case 'SET_LANGUAGE':
+      localStorage.setItem('language', action.language)
+      return { ...state, language: action.language }
     case 'SET_LOADING':
       return { ...state, loading: { ...state.loading, ...action.loading } }
     default:
