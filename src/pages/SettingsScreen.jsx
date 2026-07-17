@@ -1,9 +1,13 @@
 import { useState } from 'react'
 import { ChevronLeft } from 'lucide-react'
 import { useApp } from '../context/AppContext'
+import { useProfile } from '../hooks/useProfile'
+import { useT, LANGUAGES } from '../lib/i18n'
 
 export default function SettingsScreen({ onBack }) {
   const { state, dispatch } = useApp()
+  const { setLanguage } = useProfile()
+  const t = useT()
   const [name, setName] = useState(state.babyName)
   const [saved, setSaved] = useState(false)
 
@@ -13,6 +17,11 @@ export default function SettingsScreen({ onBack }) {
     setName(trimmed)
     setSaved(true)
     setTimeout(() => setSaved(false), 1600)
+  }
+
+  function handleLanguageChange(code) {
+    if (code === state.language) return
+    setLanguage({ userId: state.user.id, language: code })
   }
 
   const dirty = name.trim() !== state.babyName
@@ -28,7 +37,7 @@ export default function SettingsScreen({ onBack }) {
           <ChevronLeft size={18} />
         </button>
         <div style={{ fontFamily: '"Baloo 2", sans-serif', fontSize: 26, fontWeight: 800, color: '#241a12' }}>
-          Settings
+          {t('settings.title')}
         </div>
       </div>
 
@@ -36,9 +45,9 @@ export default function SettingsScreen({ onBack }) {
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         <label htmlFor="baby-name"
           style={{ fontFamily: '"Nunito", sans-serif', fontWeight: 800, fontSize: 13, letterSpacing: 0.4, color: '#8a7d70' }}>
-          BABY'S NAME
+          {t('settings.babyName')}
         </label>
-        <input id="baby-name" type="text" value={name} placeholder="e.g. Remi"
+        <input id="baby-name" type="text" value={name} placeholder={t('settings.babyNamePlaceholder')}
           onChange={e => setName(e.target.value)}
           onKeyDown={e => { if (e.key === 'Enter' && dirty) handleSave() }}
           style={{
@@ -47,7 +56,32 @@ export default function SettingsScreen({ onBack }) {
             background: '#fff', outline: 'none', boxSizing: 'border-box',
           }} />
         <div style={{ fontFamily: '"Nunito", sans-serif', fontWeight: 600, fontSize: 13, color: '#a89c8f', lineHeight: 1.4 }}>
-          We'll use this name throughout the app. Leave it blank to just say "your baby".
+          {t('settings.babyNameHelper')}
+        </div>
+      </div>
+
+      {/* Language field */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <label style={{ fontFamily: '"Nunito", sans-serif', fontWeight: 800, fontSize: 13, letterSpacing: 0.4, color: '#8a7d70' }}>
+          {t('settings.language')}
+        </label>
+        <div style={{ display: 'flex', background: '#f3ece2', borderRadius: 16, padding: 5, gap: 4 }}>
+          {LANGUAGES.map(({ code, label }) => {
+            const active = state.language === code
+            return (
+              <button key={code} type="button" onClick={() => handleLanguageChange(code)}
+                style={{
+                  flex: 1, padding: '11px 8px', borderRadius: 12, border: 'none', cursor: 'pointer',
+                  background: active ? '#fff' : 'transparent',
+                  boxShadow: active ? '0 4px 12px rgba(36,26,18,0.14)' : 'none',
+                  color: active ? '#241a12' : '#8a7d70',
+                  fontFamily: '"Baloo 2", sans-serif', fontWeight: 800, fontSize: 15,
+                  transition: 'all .15s ease',
+                }}>
+                {label}
+              </button>
+            )
+          })}
         </div>
       </div>
 
@@ -58,7 +92,7 @@ export default function SettingsScreen({ onBack }) {
           color: '#fff', background: dirty ? '#ff7d24' : '#e8ddd4',
           cursor: dirty ? 'pointer' : 'default', transition: 'background .15s ease',
         }}>
-        {saved ? 'Saved ✓' : 'Save'}
+        {saved ? t('settings.saved') : t('settings.save')}
       </button>
     </div>
   )

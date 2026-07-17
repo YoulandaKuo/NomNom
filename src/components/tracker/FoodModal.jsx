@@ -4,6 +4,8 @@ import { useApp } from '../../context/AppContext'
 import { useFoods } from '../../hooks/useFoods'
 import { useLogs } from '../../hooks/useLogs'
 import { REACTION_MAP, CATEGORIES, CATEGORY_MAP, MOODS } from '../../lib/preloadedFoods'
+import { useT } from '../../lib/i18n'
+import { translateFoodName } from '../../lib/foodNameTranslations'
 
 const REACTION_FACE = {
   loved:     { mouth: 'M6 13 q6 7 12 0', eyeY: 9.5, hearts: true },
@@ -45,15 +47,17 @@ function LogForm({ food, onClose, onEdit }) {
   const { state } = useApp()
   const { upsertLog } = useLogs()
   const { deleteCustomFood } = useFoods()
+  const t = useT()
   const existing = state.logs[food.id]
   const cat = CATEGORY_MAP[food.category] ?? CATEGORIES[0]
   const today = format(new Date(), 'yyyy-MM-dd')
   const canDelete = !food.is_preloaded && food.user_id === state.user.id
-  const babyName = state.babyName || 'your baby'
+  const babyName = state.babyName || t('foodModal.babyNameFallback')
+  const foodName = translateFoodName(food.name, state.language)
   const [deleting, setDeleting] = useState(false)
 
   async function handleDelete() {
-    if (!window.confirm(`Delete "${food.name}"? This can't be undone.`)) return
+    if (!window.confirm(t('foodModal.deleteConfirm', { name: foodName }))) return
     setDeleting(true)
     setError('')
     try {
@@ -127,14 +131,14 @@ function LogForm({ food, onClose, onEdit }) {
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontFamily: '"Baloo 2", sans-serif', fontWeight: 800, fontSize: 24, lineHeight: 1, color: '#241a12' }}>
-            {food.name}
+            {foodName}
           </div>
           <div style={{ display: 'flex', gap: 6, marginTop: 6, flexWrap: 'wrap' }}>
             <span style={{
               fontFamily: '"Baloo 2", sans-serif', fontWeight: 700, fontSize: 12,
               background: cat.tint, color: cat.dk, borderRadius: 20, padding: '3px 10px', lineHeight: 1.4,
             }}>
-              {cat.emoji} {cat.label}
+              {cat.emoji} {t('categoryLabel.' + cat.id)}
             </span>
           </div>
         </div>
@@ -157,7 +161,7 @@ function LogForm({ food, onClose, onEdit }) {
               fontFamily: '"Baloo 2", sans-serif', fontWeight: 800, fontSize: 16,
               transition: 'all .15s ease',
             }}>
-            Not yet
+            {t('foodModal.notYet')}
           </button>
           <button type="button" onClick={markTried}
             style={{
@@ -168,7 +172,7 @@ function LogForm({ food, onClose, onEdit }) {
               fontFamily: '"Baloo 2", sans-serif', fontWeight: 800, fontSize: 16,
               transition: 'all .15s ease',
             }}>
-            {tried ? '✓ Tried it' : 'Tried it'}
+            {tried ? t('foodModal.triedItChecked') : t('foodModal.triedIt')}
           </button>
         </div>
 
@@ -177,10 +181,10 @@ function LogForm({ food, onClose, onEdit }) {
             {/* Mood picker */}
             <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 10 }}>
               <div style={{ fontFamily: '"Baloo 2", sans-serif', fontWeight: 800, fontSize: 17, color: '#241a12' }}>
-                How did {babyName} like it?
+                {t('foodModal.howDidLike', { babyName })}
               </div>
               <div style={{ fontFamily: '"Nunito", sans-serif', fontWeight: 700, fontSize: 13, color: '#8a7d70' }}>
-                optional
+                {t('foodModal.optional')}
               </div>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, marginBottom: 16 }}>
@@ -202,7 +206,7 @@ function LogForm({ food, onClose, onEdit }) {
                     onPointerLeave={e => e.currentTarget.style.transform = 'scale(1)'}>
                     <Face reaction={m} size={30} ink={on ? '#fff' : '#8a7d70'} />
                     <div style={{ fontFamily: '"Nunito", sans-serif', fontWeight: 800, fontSize: 12.5, marginTop: 6, color: on ? '#fff' : '#8a7d70' }}>
-                      {r.label}
+                      {t('reactionLabel.' + m)}
                     </div>
                   </button>
                 )
@@ -213,7 +217,7 @@ function LogForm({ food, onClose, onEdit }) {
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: '#f6efe6', borderRadius: 20, padding: '14px 16px' }}>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontFamily: '"Nunito", sans-serif', fontWeight: 800, fontSize: 11, letterSpacing: 0.8, color: '#8a7d70' }}>
-                  FIRST TRIED
+                  {t('foodModal.firstTried')}
                 </div>
                 {editingDate ? (
                   <input type="date" autoFocus value={dateTried ?? ''} max={today}
@@ -236,7 +240,7 @@ function LogForm({ food, onClose, onEdit }) {
                   fontFamily: '"Baloo 2", sans-serif', fontWeight: 800, fontSize: 15,
                   padding: '10px 16px', borderRadius: 14,
                 }}>
-                {editingDate ? 'Done' : 'Change'}
+                {editingDate ? t('foodModal.done') : t('foodModal.change')}
               </button>
             </div>
           </>
@@ -246,7 +250,7 @@ function LogForm({ food, onClose, onEdit }) {
             background: '#f6efe6', borderRadius: 20, padding: '18px 20px', textAlign: 'center',
             fontFamily: '"Nunito", sans-serif', fontWeight: 700, fontSize: 15, lineHeight: 1.5, color: '#8a7d70',
           }}>
-            {food.name} is still on the list — mark it tried when {babyName} takes the first taste.
+            {t('foodModal.stillOnList', { name: foodName, babyName })}
           </div>
         )}
 
@@ -261,7 +265,7 @@ function LogForm({ food, onClose, onEdit }) {
                 fontFamily: '"Baloo 2", sans-serif', fontWeight: 800, fontSize: 15,
                 cursor: 'pointer',
               }}>
-              Edit food
+              {t('foodModal.editFood')}
             </button>
             <button type="button" onClick={handleDelete} disabled={deleting}
               style={{
@@ -270,7 +274,7 @@ function LogForm({ food, onClose, onEdit }) {
                 fontFamily: '"Baloo 2", sans-serif', fontWeight: 800, fontSize: 15,
                 cursor: deleting ? 'default' : 'pointer', opacity: deleting ? 0.6 : 1,
               }}>
-              {deleting ? 'Deleting…' : 'Delete food'}
+              {deleting ? t('foodModal.deleting') : t('foodModal.deleteFood')}
             </button>
           </div>
         )}
@@ -283,6 +287,7 @@ function LogForm({ food, onClose, onEdit }) {
 function AddFoodForm({ onClose, onAdded }) {
   const { state } = useApp()
   const { addCustomFood } = useFoods()
+  const t = useT()
 
   const [name, setName] = useState('')
   const [emoji, setEmoji] = useState('')
@@ -316,7 +321,7 @@ function AddFoodForm({ onClose, onAdded }) {
     <div style={{ display: 'flex', flexDirection: 'column', maxHeight: '100%' }}>
       <div style={{ padding: '20px 18px', flex: 1, overflowY: 'auto' }} className="scrollbar-hide">
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
-          <div style={{ fontFamily: '"Baloo 2", sans-serif', fontWeight: 800, fontSize: 22, color: '#241a12' }}>Add a food</div>
+          <div style={{ fontFamily: '"Baloo 2", sans-serif', fontWeight: 800, fontSize: 22, color: '#241a12' }}>{t('foodModal.addAFood')}</div>
           <button onClick={onClose} style={{ width: 34, height: 34, borderRadius: '50%', background: '#f3ece2', border: 'none', cursor: 'pointer', display: 'grid', placeItems: 'center', color: '#8a7d70' }}>
             <XIcon size={18} />
           </button>
@@ -324,8 +329,8 @@ function AddFoodForm({ onClose, onAdded }) {
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <div>
-            <div style={{ fontFamily: '"Nunito", sans-serif', fontWeight: 800, fontSize: 12, color: '#8a7d70', marginBottom: 6 }}>FOOD NAME</div>
-            <input ref={nameRef} value={name} onChange={e => setName(e.target.value)} placeholder="e.g. Dragon Fruit"
+            <div style={{ fontFamily: '"Nunito", sans-serif', fontWeight: 800, fontSize: 12, color: '#8a7d70', marginBottom: 6 }}>{t('foodModal.foodName')}</div>
+            <input ref={nameRef} value={name} onChange={e => setName(e.target.value)} placeholder={t('foodModal.foodNamePlaceholder')}
               required
               style={{
                 width: '100%', padding: '12px 14px', borderRadius: 14, border: '2px solid #e8ddd4',
@@ -336,14 +341,14 @@ function AddFoodForm({ onClose, onAdded }) {
 
           <div>
             <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 6 }}>
-              <div style={{ fontFamily: '"Nunito", sans-serif', fontWeight: 800, fontSize: 12, color: '#8a7d70' }}>EMOJI</div>
-              <div style={{ fontFamily: '"Nunito", sans-serif', fontWeight: 700, fontSize: 11, color: '#b0a498' }}>optional</div>
+              <div style={{ fontFamily: '"Nunito", sans-serif', fontWeight: 800, fontSize: 12, color: '#8a7d70' }}>{t('foodModal.emoji')}</div>
+              <div style={{ fontFamily: '"Nunito", sans-serif', fontWeight: 700, fontSize: 11, color: '#b0a498' }}>{t('foodModal.optional')}</div>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
               <input
                 value={emoji}
                 onChange={e => setEmoji(e.target.value)}
-                placeholder="Paste or type"
+                placeholder={t('foodModal.emojiPlaceholder')}
                 maxLength={2}
                 style={{
                   flex: 1, padding: '12px 14px', borderRadius: 14, border: '2px solid #e8ddd4',
@@ -361,7 +366,7 @@ function AddFoodForm({ onClose, onAdded }) {
           </div>
 
           <div>
-            <div style={{ fontFamily: '"Nunito", sans-serif', fontWeight: 800, fontSize: 12, color: '#8a7d70', marginBottom: 8 }}>CATEGORY</div>
+            <div style={{ fontFamily: '"Nunito", sans-serif', fontWeight: 800, fontSize: 12, color: '#8a7d70', marginBottom: 8 }}>{t('foodModal.category')}</div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
               {CATEGORIES.map(cat => (
                 <button key={cat.id} type="button" onClick={() => setCategory(cat.id)}
@@ -375,7 +380,7 @@ function AddFoodForm({ onClose, onAdded }) {
                     color: category === cat.id ? '#fff' : '#8a7d70',
                     cursor: 'pointer', transition: 'all .12s ease',
                   }}>
-                  <span>{cat.emoji}</span><span>{cat.label}</span>
+                  <span>{cat.emoji}</span><span>{t('categoryLabel.' + cat.id)}</span>
                 </button>
               ))}
             </div>
@@ -390,7 +395,7 @@ function AddFoodForm({ onClose, onAdded }) {
               color: !name.trim() ? '#8a7d70' : '#fff',
               fontFamily: '"Baloo 2", sans-serif', fontWeight: 800, fontSize: 17,
             }}>
-            {saving ? 'Adding…' : 'Add food'}
+            {saving ? t('foodModal.adding') : t('foodModal.addFoodBtn')}
           </button>
         </form>
       </div>
@@ -402,6 +407,7 @@ function AddFoodForm({ onClose, onAdded }) {
 function EditFoodForm({ food, onClose, onSaved }) {
   const { state } = useApp()
   const { updateCustomFood } = useFoods()
+  const t = useT()
 
   const [name, setName] = useState(food.name)
   const [emoji, setEmoji] = useState(food.emoji ?? '')
@@ -433,7 +439,7 @@ function EditFoodForm({ food, onClose, onSaved }) {
     <div style={{ display: 'flex', flexDirection: 'column', maxHeight: '100%' }}>
       <div style={{ padding: '20px 18px', flex: 1, overflowY: 'auto' }} className="scrollbar-hide">
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
-          <div style={{ fontFamily: '"Baloo 2", sans-serif', fontWeight: 800, fontSize: 22, color: '#241a12' }}>Edit food</div>
+          <div style={{ fontFamily: '"Baloo 2", sans-serif', fontWeight: 800, fontSize: 22, color: '#241a12' }}>{t('foodModal.editFood')}</div>
           <button onClick={onClose} style={{ width: 34, height: 34, borderRadius: '50%', background: '#f3ece2', border: 'none', cursor: 'pointer', display: 'grid', placeItems: 'center', color: '#8a7d70' }}>
             <XIcon size={18} />
           </button>
@@ -441,7 +447,7 @@ function EditFoodForm({ food, onClose, onSaved }) {
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <div>
-            <div style={{ fontFamily: '"Nunito", sans-serif', fontWeight: 800, fontSize: 12, color: '#8a7d70', marginBottom: 6 }}>FOOD NAME</div>
+            <div style={{ fontFamily: '"Nunito", sans-serif', fontWeight: 800, fontSize: 12, color: '#8a7d70', marginBottom: 6 }}>{t('foodModal.foodName')}</div>
             <input value={name} onChange={e => setName(e.target.value)} required
               style={{
                 width: '100%', padding: '12px 14px', borderRadius: 14, border: '2px solid #e8ddd4',
@@ -452,14 +458,14 @@ function EditFoodForm({ food, onClose, onSaved }) {
 
           <div>
             <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 6 }}>
-              <div style={{ fontFamily: '"Nunito", sans-serif', fontWeight: 800, fontSize: 12, color: '#8a7d70' }}>EMOJI</div>
-              <div style={{ fontFamily: '"Nunito", sans-serif', fontWeight: 700, fontSize: 11, color: '#b0a498' }}>optional</div>
+              <div style={{ fontFamily: '"Nunito", sans-serif', fontWeight: 800, fontSize: 12, color: '#8a7d70' }}>{t('foodModal.emoji')}</div>
+              <div style={{ fontFamily: '"Nunito", sans-serif', fontWeight: 700, fontSize: 11, color: '#b0a498' }}>{t('foodModal.optional')}</div>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
               <input
                 value={emoji}
                 onChange={e => setEmoji(e.target.value)}
-                placeholder="Paste or type"
+                placeholder={t('foodModal.emojiPlaceholder')}
                 maxLength={2}
                 style={{
                   flex: 1, padding: '12px 14px', borderRadius: 14, border: '2px solid #e8ddd4',
@@ -477,7 +483,7 @@ function EditFoodForm({ food, onClose, onSaved }) {
           </div>
 
           <div>
-            <div style={{ fontFamily: '"Nunito", sans-serif', fontWeight: 800, fontSize: 12, color: '#8a7d70', marginBottom: 8 }}>CATEGORY</div>
+            <div style={{ fontFamily: '"Nunito", sans-serif', fontWeight: 800, fontSize: 12, color: '#8a7d70', marginBottom: 8 }}>{t('foodModal.category')}</div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
               {CATEGORIES.map(cat => (
                 <button key={cat.id} type="button" onClick={() => setCategory(cat.id)}
@@ -491,7 +497,7 @@ function EditFoodForm({ food, onClose, onSaved }) {
                     color: category === cat.id ? '#fff' : '#8a7d70',
                     cursor: 'pointer', transition: 'all .12s ease',
                   }}>
-                  <span>{cat.emoji}</span><span>{cat.label}</span>
+                  <span>{cat.emoji}</span><span>{t('categoryLabel.' + cat.id)}</span>
                 </button>
               ))}
             </div>
@@ -506,7 +512,7 @@ function EditFoodForm({ food, onClose, onSaved }) {
               color: !name.trim() ? '#8a7d70' : '#fff',
               fontFamily: '"Baloo 2", sans-serif', fontWeight: 800, fontSize: 17,
             }}>
-            {saving ? 'Saving…' : 'Save changes'}
+            {saving ? t('foodModal.saving') : t('foodModal.saveChanges')}
           </button>
         </form>
       </div>

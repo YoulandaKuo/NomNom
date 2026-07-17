@@ -1,6 +1,8 @@
 import { useApp } from '../../context/AppContext'
 import { CATEGORY_MAP, REACTION_MAP } from '../../lib/preloadedFoods'
 import { EmojiImage } from '../../lib/emojiUtils.jsx'
+import { useT } from '../../lib/i18n'
+import { translateFoodName } from '../../lib/foodNameTranslations'
 
 const REACTION_FACE = {
   loved:     { mood: 'love',  mouth: 'M6 13 q6 7 12 0' },
@@ -42,6 +44,7 @@ function ReactionFace({ reaction, size = 18 }) {
 
 export default function FoodCard({ food, onOpen }) {
   const { state, dispatch } = useApp()
+  const t = useT()
   const log = state.logs[food.id]
   const reaction = log?.reaction ?? 'not_tried'
   const tried = reaction !== 'not_tried'
@@ -99,7 +102,7 @@ export default function FoodCard({ food, onOpen }) {
         marginTop: 6, color: tried ? '#8a7d70' : '#241a12', lineHeight: 1.2,
         overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
       }}>
-        {food.name}
+        {translateFoodName(food.name, state.language)}
       </div>
 
       {/* Reaction label */}
@@ -107,7 +110,7 @@ export default function FoodCard({ food, onOpen }) {
         fontFamily: '"Nunito", sans-serif', fontWeight: 800, fontSize: 11,
         color: tried ? '#c4b4a3' : '#8a7d70', marginTop: 1,
       }}>
-        {tried ? (REACTION_MAP[reaction]?.label ?? reaction) : 'tap to log'}
+        {tried ? t('reactionLabel.' + reaction) : t('foodCard.tapToLog')}
       </div>
     </button>
   )

@@ -3,6 +3,7 @@ import { LogOut, MoreVertical, Settings } from 'lucide-react'
 import { useApp } from '../context/AppContext'
 import { useAuth } from '../hooks/useAuth'
 import { CATEGORIES } from '../lib/preloadedFoods'
+import { useT } from '../lib/i18n'
 
 const menuItemStyle = {
   display: 'flex', alignItems: 'center', gap: 10, width: '100%',
@@ -15,6 +16,7 @@ const menuItemStyle = {
 export default function HomeScreen({ onOpenCategory, onOpenSettings }) {
   const { state } = useApp()
   const { signOut } = useAuth()
+  const t = useT()
   const [menuOpen, setMenuOpen] = useState(false)
   const [confirmLogout, setConfirmLogout] = useState(false)
   const menuRef = useRef(null)
@@ -79,7 +81,7 @@ export default function HomeScreen({ onOpenCategory, onOpenSettings }) {
                 onPointerEnter={e => e.currentTarget.style.background = '#f6efe6'}
                 onPointerLeave={e => e.currentTarget.style.background = 'transparent'}>
                 <Settings size={17} color="#8a7d70" />
-                <span>Settings</span>
+                <span>{t('home.settings')}</span>
               </button>
               <button role="menuitem"
                 onClick={() => { setMenuOpen(false); setConfirmLogout(true) }}
@@ -87,7 +89,7 @@ export default function HomeScreen({ onOpenCategory, onOpenSettings }) {
                 onPointerEnter={e => e.currentTarget.style.background = '#f6efe6'}
                 onPointerLeave={e => e.currentTarget.style.background = 'transparent'}>
                 <LogOut size={17} color="#8a7d70" />
-                <span>Log out</span>
+                <span>{t('home.logout')}</span>
               </button>
             </div>
           )}
@@ -106,10 +108,10 @@ export default function HomeScreen({ onOpenCategory, onOpenSettings }) {
         onPointerUp={e => e.currentTarget.style.transform = 'scale(1)'}
         onPointerLeave={e => e.currentTarget.style.transform = 'scale(1)'}>
         <div style={{ position: 'absolute', right: -16, top: -16, fontSize: 96, opacity: 0.12 }}>🍴</div>
-        <div style={{ fontFamily: '"Nunito", sans-serif', fontWeight: 800, fontSize: 13, color: '#ffb784', letterSpacing: 0.4 }}>ALL</div>
+        <div style={{ fontFamily: '"Nunito", sans-serif', fontWeight: 800, fontSize: 13, color: '#ffb784', letterSpacing: 0.4 }}>{t('home.all')}</div>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
           <span style={{ fontFamily: '"Baloo 2", sans-serif', fontSize: 52, fontWeight: 800, lineHeight: 1 }}>{variety}</span>
-          <span style={{ fontFamily: '"Nunito", sans-serif', fontWeight: 700, fontSize: 14, opacity: 0.7, whiteSpace: 'nowrap' }}>foods so far</span>
+          <span style={{ fontFamily: '"Nunito", sans-serif', fontWeight: 700, fontSize: 14, opacity: 0.7, whiteSpace: 'nowrap' }}>{t('home.foodsSoFar')}</span>
         </div>
         <div style={{ display: 'flex', height: 8, borderRadius: 4, marginTop: 13, overflow: 'hidden', background: 'rgba(255,255,255,0.16)' }}>
           {catStats.map(cat => {
@@ -123,7 +125,7 @@ export default function HomeScreen({ onOpenCategory, onOpenSettings }) {
 
       {/* Food groups heading */}
       <div style={{ fontFamily: '"Baloo 2", sans-serif', fontSize: 19, fontWeight: 800, color: '#241a12' }}>
-        Food groups
+        {t('home.foodGroups')}
       </div>
 
       {/* Category grid */}
@@ -149,7 +151,7 @@ export default function HomeScreen({ onOpenCategory, onOpenSettings }) {
               </span>
             </div>
             <div>
-              <div style={{ fontFamily: '"Baloo 2", sans-serif', fontWeight: 800, fontSize: 17, marginTop: 8 }}>{cat.label}</div>
+              <div style={{ fontFamily: '"Baloo 2", sans-serif', fontWeight: 800, fontSize: 17, marginTop: 8 }}>{t('categoryLabel.' + cat.id)}</div>
               <div style={{ height: 6, borderRadius: 3, background: 'rgba(255,255,255,0.28)', marginTop: 5, overflow: 'hidden' }}>
                 <div style={{ width: `${cat.total ? cat.tried / cat.total * 100 : 0}%`, height: '100%', background: '#fff', borderRadius: 3, transition: 'width .35s ease' }} />
               </div>
@@ -170,10 +172,10 @@ export default function HomeScreen({ onOpenCategory, onOpenSettings }) {
             }}>
             <div style={{ fontSize: 36 }}>👋</div>
             <div style={{ fontFamily: '"Baloo 2", sans-serif', fontWeight: 800, fontSize: 21, color: '#241a12', marginTop: 6 }}>
-              Log out?
+              {t('home.logoutConfirmTitle')}
             </div>
             <div style={{ fontFamily: '"Nunito", sans-serif', fontWeight: 600, fontSize: 15, color: '#8a7d70', marginTop: 6, lineHeight: 1.4 }}>
-              You'll need to sign back in to keep tracking.
+              {t('home.logoutConfirmBody')}
             </div>
             <div style={{ display: 'flex', gap: 10, marginTop: 20 }}>
               <button onClick={() => setConfirmLogout(false)}
@@ -182,7 +184,7 @@ export default function HomeScreen({ onOpenCategory, onOpenSettings }) {
                   fontFamily: '"Baloo 2", sans-serif', fontWeight: 800, fontSize: 16,
                   color: '#241a12', background: '#f3ece2',
                 }}>
-                Cancel
+                {t('home.cancel')}
               </button>
               <button onClick={() => { setConfirmLogout(false); signOut() }}
                 style={{
@@ -190,7 +192,7 @@ export default function HomeScreen({ onOpenCategory, onOpenSettings }) {
                   fontFamily: '"Baloo 2", sans-serif', fontWeight: 800, fontSize: 16,
                   color: '#fff', background: '#ec4d3f',
                 }}>
-                Log out
+                {t('home.logout')}
               </button>
             </div>
           </div>
