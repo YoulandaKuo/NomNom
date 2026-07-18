@@ -47,14 +47,25 @@ export default function SettingsScreen({ onBack }) {
           style={{ fontFamily: '"Nunito", sans-serif', fontWeight: 800, fontSize: 13, letterSpacing: 0.4, color: '#8a7d70' }}>
           {t('settings.babyName')}
         </label>
-        <input id="baby-name" type="text" value={name} placeholder={t('settings.babyNamePlaceholder')}
-          onChange={e => setName(e.target.value)}
-          onKeyDown={e => { if (e.key === 'Enter' && dirty) handleSave() }}
-          style={{
-            padding: '14px 16px', borderRadius: 16, border: '2px solid #e8ddd4',
-            fontFamily: '"Baloo 2", sans-serif', fontWeight: 700, fontSize: 18, color: '#241a12',
-            background: '#fff', outline: 'none', boxSizing: 'border-box',
-          }} />
+        <div style={{ display: 'flex', gap: 10 }}>
+          <input id="baby-name" type="text" value={name} placeholder={t('settings.babyNamePlaceholder')}
+            onChange={e => setName(e.target.value)}
+            onKeyDown={e => { if (e.key === 'Enter' && dirty) handleSave() }}
+            style={{
+              flex: 1, minWidth: 0, padding: '14px 16px', borderRadius: 16, border: '2px solid #e8ddd4',
+              fontFamily: '"Baloo 2", sans-serif', fontWeight: 700, fontSize: 18, color: '#241a12',
+              background: '#fff', outline: 'none', boxSizing: 'border-box',
+            }} />
+          <button onClick={handleSave} disabled={!dirty}
+            style={{
+              flexShrink: 0, padding: '14px 16px', borderRadius: 16, border: 'none',
+              fontFamily: '"Baloo 2", sans-serif', fontWeight: 800, fontSize: 17,
+              color: '#fff', background: dirty ? '#ff7d24' : '#e8ddd4',
+              cursor: dirty ? 'pointer' : 'default', transition: 'background .15s ease',
+            }}>
+            {saved ? t('settings.saved') : t('settings.save')}
+          </button>
+        </div>
         <div style={{ fontFamily: '"Nunito", sans-serif', fontWeight: 600, fontSize: 13, color: '#a89c8f', lineHeight: 1.4 }}>
           {t('settings.babyNameHelper')}
         </div>
@@ -84,16 +95,6 @@ export default function SettingsScreen({ onBack }) {
           })}
         </div>
       </div>
-
-      <button onClick={handleSave} disabled={!dirty}
-        style={{
-          marginTop: 4, padding: '14px 16px', borderRadius: 16, border: 'none',
-          fontFamily: '"Baloo 2", sans-serif', fontWeight: 800, fontSize: 17,
-          color: '#fff', background: dirty ? '#ff7d24' : '#e8ddd4',
-          cursor: dirty ? 'pointer' : 'default', transition: 'background .15s ease',
-        }}>
-        {saved ? t('settings.saved') : t('settings.save')}
-      </button>
     </div>
   )
 }
